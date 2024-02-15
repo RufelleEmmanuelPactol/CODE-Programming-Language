@@ -1,5 +1,8 @@
 package com.code.data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /***
  * The primitive data type of the CODE programming language.
  * This class is the base class for all primitive data types in CODE.
@@ -7,16 +10,22 @@ package com.code.data;
  * Throws @TypeError if the operation is not supported for the given data type.
  */
 
-public abstract class CodePrimitive {
 
-    private Runtime runtime;
-    private String value;
+public abstract class CodePrimitive<T> {
+    protected String tokenRepresentation;
+    protected T data;
+
+    public abstract String getTypeStrRepresenation();
 
 
-    public CodePrimitive (Runtime runtime, String value) {
-        this.runtime = runtime;
-        this.value = value;
+
+    public CodePrimitive (String tokenRepresentation, T data) {
+        this.tokenRepresentation = tokenRepresentation;
+        this.allowedClasses = new HashSet<>();
+        this.data = data;
     }
+
+    protected Set<Class<? extends CodePrimitive>> allowedClasses;
 
 
     public abstract String toString();
@@ -28,8 +37,9 @@ public abstract class CodePrimitive {
     public abstract CodePrimitive modulo(CodePrimitive other);
     public abstract CodePrimitive increment(CodePrimitive other);
     public abstract CodePrimitive decrement(CodePrimitive other);
-    public abstract CodePrimitive and(CodePrimitive other);
-    public abstract CodePrimitive or(CodePrimitive other);
-    public abstract CodePrimitive not();
+    public abstract CodeBoolean and(CodePrimitive other);
+    public abstract CodeBoolean or(CodePrimitive other);
+    public abstract CodeBoolean not();
+    public abstract CodeBoolean bool();
 
 }

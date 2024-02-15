@@ -1,17 +1,19 @@
 package com.code.virtualmachine;
 
 import com.code.frames.StackFrame;
+import exceptions.StandardErrorHandler;
 
 import java.util.Stack;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * The executor class is the class that is responsible for executing the code.
- * There can be multiple executors running at the same time, each with their own
+ * The VMThread class is the class that is responsible for executing the code.
+ * There can be multiple threads running at the same time, each with their own
  * thread and stack frame.
  */
 public class VMThread {
     private int currentLineNumber;
+    private String threadName;
     private static final ReentrantLock lock = new ReentrantLock();
 
     public void incrementLineNumber() {
@@ -26,8 +28,9 @@ public class VMThread {
         }
     }
 
-    public VMThread(int currentLineNumber) {
+    public VMThread(int currentLineNumber, String threadName) {
         this.currentLineNumber = currentLineNumber;
+        this.threadName = threadName;
     }
 
     /**
@@ -46,5 +49,12 @@ public class VMThread {
         synchronized (lock) {
             return threadStack.pop();
         }
+    }
+
+    protected void createProcess (Runnable process) {
+        Thread t = new Thread(process);
+        t.setUncaughtExceptionHandler(new StandardErrorHandler());
+        t.setName("com.code.vm.process.thread::virtual.std::protocol[" + threadName +"]:\n");
+        t.start();
     }
 }
