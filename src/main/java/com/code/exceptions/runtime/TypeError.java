@@ -1,4 +1,4 @@
-package exceptions.runtime;
+package com.code.exceptions.runtime;
 
 import com.code.data.CodePrimitive;
 import com.code.virtualmachine.CodeRuntime;

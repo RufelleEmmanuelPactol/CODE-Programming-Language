@@ -13,4 +13,11 @@ public abstract class Token {
     public static Token createMemberIfValid(String keyword) {
         return null;
     }
+
+    public Token() {}
+
+    public String toString() {
+        return this.getClass().getCanonicalName();
+    }
+
 }

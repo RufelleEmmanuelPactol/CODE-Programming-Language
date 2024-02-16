@@ -1,6 +1,6 @@
 package com.code.data;
 
-import exceptions.runtime.TypeError;
+import com.code.exceptions.runtime.TypeError;
 
 public class CodeInteger extends CodePrimitive<Integer>{
 

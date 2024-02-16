@@ -1,6 +1,6 @@
-package exceptions.runtime;
+package com.code.exceptions.runtime;
 
-import exceptions.CodeError;
+import com.code.exceptions.CodeError;
 
 public abstract class VMRuntimeError extends CodeError {
 

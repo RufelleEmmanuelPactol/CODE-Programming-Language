@@ -1,4 +1,4 @@
-package exceptions;
+package com.code.exceptions;
 
 public abstract class CodeError extends RuntimeException {
 

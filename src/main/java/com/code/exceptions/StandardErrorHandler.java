@@ -1,4 +1,4 @@
-package exceptions;
+package com.code.exceptions;
 
 public class StandardErrorHandler implements Thread.UncaughtExceptionHandler {
     @Override

@@ -1,7 +1,7 @@
 package com.code.virtualmachine;
 
 import com.code.frames.StackFrame;
-import exceptions.StandardErrorHandler;
+import com.code.exceptions.StandardErrorHandler;
 
 import java.util.Stack;
 import java.util.concurrent.locks.ReentrantLock;

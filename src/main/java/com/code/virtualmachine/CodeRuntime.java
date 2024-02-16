@@ -32,7 +32,7 @@ public class CodeRuntime {
      * This method runs the process using the main thread.
      * The main thread is the only thread that is currently supported.
      */
-    public void runUsingMainThread(Runnable process) {
+    public void runUsingMainThread(Runnable process)  {
         GLOBAL_THREAD.createProcess(process);
     }
 }

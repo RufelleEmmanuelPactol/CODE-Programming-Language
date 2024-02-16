@@ -1,6 +1,6 @@
 package com.code.data;
 
-import exceptions.runtime.TypeError;
+import com.code.exceptions.runtime.TypeError;
 
 import java.util.HashSet;
 
@@ -9,6 +9,12 @@ public class CodeString extends CodePrimitive<String>{
         super(data, data);
         this.allowedClasses = new HashSet<>();
         this.allowedClasses.add(CodeString.class);
+        // update the data to remove the escape characters
+        // escape characters are basically /, and retain the character after it
+        // also remove the starting and trailing ""
+        this.data = data.substring(1, data.length() - 1).replaceAll("\\\\(.)", "$1");
+        this.tokenRepresentation = data;
+
     }
 
     @Override
