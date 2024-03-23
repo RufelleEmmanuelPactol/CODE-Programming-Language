@@ -1,5 +1,7 @@
 package com.code.tokenizer;
 
+import com.code.tokenizer.tokens.Token;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,18 +11,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LeximCursor implements Iterable<String> {
-    private ArrayList<String> lexims;
+    protected ArrayList<String> lexims;
 
 
     public LeximCursor(String codeLine) {
         lexims = new ArrayList<>();
         ArrayList<String> tokens = new ArrayList<>();
         // Updated pattern string to handle escaped quotes within quoted strings and ensure operators are matched correctly
-        String patternString =
-                "(\"(?:\\\\\"|[^\"])*?\")" + // Match quoted strings, accounting for escaped quotes
-                        "|(>=|<=|==|\\+\\+|--|\\+|-|/|\\*|>|%)|([()=;.,])" + // Match operators including '>', and single character tokens
-                        "|(\\d+)" + // Match integers
-                        "|(\\w+)"; // Match words
+        String patternString = "(\"(?:\\\\\"|[^\"])*?\")" +
+                "|(>=|<=|==|\\+\\+|--|\\+|-|/|\\*|>|%)|" +
+                "([()=;.,:{}])|" +
+                "(\\d+)|" +
+                "([\\w&|]+)";
+
 
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(codeLine);
@@ -32,6 +35,7 @@ public class LeximCursor implements Iterable<String> {
                 }
             }
         }
+        lexims.add("\n");
 
         lexims = tokens;
     }
@@ -52,6 +56,7 @@ public class LeximCursor implements Iterable<String> {
     }
 
 
-    // implement such that we can use java range based for loop
+
+
 
 }

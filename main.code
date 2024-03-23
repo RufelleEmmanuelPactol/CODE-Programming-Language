@@ -1,4 +1,16 @@
-BEGIN CODE
-INT X, Y, Z;
+3 + 3
 
+BEGIN IF
+
+END IF
+
+
+
+BEGIN CODE
+    LET x = 3
+    x = 2
+    5 + 3
+    2 + 1
+    STRING x = SCAN
+    DISPLAY "hello, world"
 END CODE

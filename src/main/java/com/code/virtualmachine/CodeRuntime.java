@@ -1,5 +1,14 @@
 package com.code.virtualmachine;
 
+import com.code.exceptions.compile.NoStartError;
+import com.code.tokenizer.LeximCursor;
+import com.code.tokenizer.TokenCursor;
+import com.code.tokenizer.tokens.BeginStatement;
+import com.code.tokenizer.tokens.CodeBlock;
+import com.code.tokenizer.tokens.Token;
+
+import java.util.ArrayList;
+
 /**
  * The Runtime class is the class that manages the runtime of the virtual machine.
  * It contains the global thread and the lock that is used to synchronize the threads.
@@ -7,6 +16,15 @@ package com.code.virtualmachine;
  * threads.
  */
 public class CodeRuntime {
+
+
+
+    private int startAt = -1;
+
+
+
+
+
 
     public final VMThread GLOBAL_THREAD;
 

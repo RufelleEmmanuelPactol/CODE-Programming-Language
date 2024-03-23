@@ -14,10 +14,17 @@ public abstract class Token {
         return null;
     }
 
-    public Token() {}
+    public Token(String representation) {
+        this.tokenAsString = representation;
+    }
+
+    private String getTokenAsString() {
+        return tokenAsString;
+    }
+    private final String tokenAsString;
 
     public String toString() {
-        return this.getClass().getCanonicalName();
+        return this.getClass().getCanonicalName() + "(" + getTokenAsString() + ")";
     }
 
 }

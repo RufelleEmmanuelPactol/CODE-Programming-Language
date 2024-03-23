@@ -1,0 +1,10 @@
+package com.code.parser;
+
+public enum Terms {
+
+    // TERM FOR PAREN
+    LPAREN, RPAREN, LBRACE, RBRACE, LBRACKET, RBRACKET,
+
+    OPERATOR, EXPRESSION, IF_BLOCK, WHILE_BLOCK, FUNCTION_BLOCK, CODE_BLOCK,
+
+}

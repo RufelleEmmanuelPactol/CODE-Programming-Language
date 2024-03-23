@@ -6,6 +6,7 @@ public class ValueToken extends Token {
 
 
     public ValueToken(CodePrimitive<?> data) {
+        super(data.toString());
 
     }
 }
