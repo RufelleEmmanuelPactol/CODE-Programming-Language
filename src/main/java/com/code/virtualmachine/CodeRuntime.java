@@ -1,6 +1,7 @@
 package com.code.virtualmachine;
 
 import com.code.exceptions.compile.NoStartError;
+import com.code.parser.engine.SymbolTable;
 import com.code.tokenizer.LeximCursor;
 import com.code.tokenizer.TokenCursor;
 import com.code.tokenizer.tokens.BeginStatement;
@@ -17,9 +18,11 @@ import java.util.ArrayList;
  */
 public class CodeRuntime {
 
+    public SymbolTable runtimeSymbolTable;
 
 
-    private int startAt = -1;
+
+
 
 
 
@@ -32,7 +35,8 @@ public class CodeRuntime {
      * Don't let anyone instantiate this class.
      */
     private CodeRuntime() {
-        GLOBAL_THREAD = new VMThread(0, "MAIN_THREAD");
+        GLOBAL_THREAD = new VMThread(1, "MAIN_THREAD");
+        runtimeSymbolTable = new SymbolTable();
     };
 
     private static final CodeRuntime CURRENT_RUNTIME = new CodeRuntime();

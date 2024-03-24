@@ -1,6 +1,5 @@
 package com.code.tokenizer;
 
-import com.code.Main;
 import com.code.data.CodeInteger;
 import com.code.data.CodeString;
 import com.code.tokenizer.tokens.*;
@@ -30,12 +29,12 @@ public class TokenFactory {
         addBinaryOperator("<=");
         addBinaryOperator("==");
         addBinaryOperator("+=");
-        addBinaryOperator("/");
-        addBinaryOperator("*");
         addBinaryOperator("%");
         addBinaryOperator("AND");
         addBinaryOperator("OR");
         addUnaryOperator("NOT");
+        factoryMaster.put("*", TermToken.class);
+        factoryMaster.put("/", TermToken.class);
         factoryMaster.put("+", MultiTypeOperator.class);
         factoryMaster.put("-", MultiTypeOperator.class);
         factoryMaster.put("[", LeftBracket.class);
@@ -48,8 +47,8 @@ public class TokenFactory {
         factoryMaster.put(";", Separator.class);
         factoryMaster.put(".", DotOperator.class);
         factoryMaster.put("=", AssignmentToken.class);
-        factoryMaster.put("(", OpenParenthesis.class);
-        factoryMaster.put(")", CloseParenthesis.class);
+        factoryMaster.put("(", LeftParen.class);
+        factoryMaster.put(")", RightParen.class);
         factoryMaster.put("WHILE", WhileToken.class);
         factoryMaster.put("BEGIN", BeginStatement.class);
         factoryMaster.put("END", EndStatement.class);
@@ -57,7 +56,7 @@ public class TokenFactory {
         factoryMaster.put(":", Colon.class);
         factoryMaster.put("{", LeftBrace.class);
         factoryMaster.put("}", RightBrace.class);
-        factoryMaster.put("\n", Delimiter.class);
+        factoryMaster.put("\n", NewLine.class);
         addDataType("INT");
         addDataType("STRING");
         addDataType("BOOL");
@@ -93,6 +92,7 @@ public class TokenFactory {
 
     public TokenFactory(){
         tokens = new ArrayList<>();
+        initializeOperators();
     }
 
 
@@ -110,37 +110,38 @@ public class TokenFactory {
                 // typically, these are numbers and strings, ergo, R-values.
                 ArrayList<Token> tokens = new ArrayList<>();
                 for (String lexim : lexims) {
+                    if (lexim.equals("#")) break;
                     Token token = terminalExpressionMatch(lexim);
                     if (token != null) {
                         tokens.add(token);
                         continue;
                     }
                     
-                // If the lexim is not an r-value, we try to match it to the factory master
-                // which contains the classes that are used to create the tokens.
-                Class<? extends Token> maybe = factoryMaster.get(lexim);
+                    // If the lexim is not an r-value, we try to match it to the factory master
+                    // which contains the classes that are used to create the tokens.
+                    Class<? extends Token> maybe = factoryMaster.get(lexim);
+                    // Here, we can check if it is a match.
+                    if (maybe != null) {
+                        // See this code here? We are basically creating a new instance of the token
+                        // by using reflection. Here, we get the constructor of the class, set it to accessible
+                        // and then create a new instance of the token. This is a bit slower than the traditional
+                        // way of creating objects, but it is more flexible.
 
-                // Here, we can check if it is a match.    
-                if (maybe != null) {
-                    // See this code here? We are basically creating a new instance of the token
-                    // by using reflection. Here, we get the constructor of the class, set it to accessible
-                    // and then create a new instance of the token. This is a bit slower than the traditional
-                    // way of creating objects, but it is more flexible.
-                    Constructor<? extends Token> constructor = maybe.getDeclaredConstructor(genericParameterTypes);
-                    constructor.setAccessible(true);
-                    tokens.add(constructor.newInstance(lexim));
-                    continue;
-                }
+                        Constructor<? extends Token> constructor = maybe.getDeclaredConstructor(genericParameterTypes);
+                        constructor.setAccessible(true);
+                        tokens.add(constructor.newInstance(lexim));
+                        continue;
+                    }
 
-                // If not, we can assume that it is a non-terminal. However,
-                // this will be rechecked via the symbol table if it exists.
-                // since the symbol table only accepts valid declarations, such as:
-                    
-                // `INT x = 10`
-                // `STRING y = "Hello, World!"`
-                // `BOOL z = TRUE`
-                // `BEGIN FUNCTION MAIN`, here `MAIN` is a non-terminal.    
-                tokens.add(new NonTerminals(lexim));
+                    // If not, we can assume that it is a non-terminal. However,
+                    // this will be rechecked via the symbol table if it exists.
+                    // since the symbol table only accepts valid declarations, such as:
+
+                    // `INT x = 10`
+                    // `STRING y = "Hello, World!"`
+                    // `BOOL z = TRUE`
+                    // `BEGIN FUNCTION MAIN`, here `MAIN` is a non-terminal.
+                    tokens.add(new NonTerminals(lexim));
             }
             return new TokenCursor(tokens);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {

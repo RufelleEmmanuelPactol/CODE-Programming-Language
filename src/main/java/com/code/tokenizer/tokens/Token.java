@@ -18,10 +18,11 @@ public abstract class Token {
         this.tokenAsString = representation;
     }
 
-    private String getTokenAsString() {
+    public String getTokenAsString() {
         return tokenAsString;
     }
     private final String tokenAsString;
+
 
     public String toString() {
         return this.getClass().getCanonicalName() + "(" + getTokenAsString() + ")";

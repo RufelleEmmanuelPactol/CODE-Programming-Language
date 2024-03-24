@@ -20,7 +20,7 @@ public class LeximCursor implements Iterable<String> {
         // Updated pattern string to handle escaped quotes within quoted strings and ensure operators are matched correctly
         String patternString = "(\"(?:\\\\\"|[^\"])*?\")" +
                 "|(>=|<=|==|\\+\\+|--|\\+|-|/|\\*|>|%)|" +
-                "([()=;.,:{}])|" +
+                "([()=;.,:{}#])|" +
                 "(\\d+)|" +
                 "([\\w&|]+)";
 
@@ -35,8 +35,7 @@ public class LeximCursor implements Iterable<String> {
                 }
             }
         }
-        lexims.add("\n");
-
+       tokens.add("\n");
         lexims = tokens;
     }
 

@@ -1,6 +1,9 @@
 package com.code.tokenizer;
 
+import com.code.exceptions.compile.ParseError;
+import com.code.tokenizer.tokens.NewLine;
 import com.code.tokenizer.tokens.Token;
+import com.code.virtualmachine.CodeRuntime;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,11 +17,26 @@ public class TokenCursor implements Iterable<Token> {
         this.tokens = tokens;
     }
 
+    public void append(Token token) {
+        tokens.add(token);
+    }
+
     public Token next() {
+
         if (currentIndex < tokens.size()) {
+            if (current() instanceof NewLine) {
+                CodeRuntime.getRuntime().GLOBAL_THREAD.incrementLineNumber();
+            }
             return tokens.get(currentIndex++);
         }
         return null;
+    }
+
+    public Token current() {
+        if (currentIndex < tokens.size()) {
+            return tokens.get(currentIndex);
+        }
+        throw new ParseError("No more tokens to parse! Your statement is incomplete.");
     }
 
     public ArrayList<Token> getAll() {

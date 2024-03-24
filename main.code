@@ -1,16 +1,11 @@
-3 + 3
 
-BEGIN IF
-
-END IF
-
+BEGIN FUNCTION sampleFunction
+(3) wedaewq
+END FUNCTION
 
 
 BEGIN CODE
-    LET x = 3
-    x = 2
-    5 + 3
-    2 + 1
-    STRING x = SCAN
-    DISPLAY "hello, world"
+    INT x, y, z= 3
+    INT abc = (3 + 2) * 5 / 2
 END CODE
+
