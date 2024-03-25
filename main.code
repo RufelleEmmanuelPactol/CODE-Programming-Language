@@ -1,11 +1,7 @@
 
-BEGIN FUNCTION sampleFunction
-(3) wedaewq
-END FUNCTION
-
 
 BEGIN CODE
-    INT x, y, z= 3
-    INT abc = (3 + 2) * 5 / 2
+    FLOAT a = 32.123 * 2
+    DISPLAY: NOT CAST_BOOL (CAST_STRING 123 & CAST_STRING 3)
 END CODE
 

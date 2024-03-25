@@ -1,5 +1,7 @@
 package com.code.data;
 
+import com.code.errors.compile.PrimitiveInitializationError;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,29 +19,56 @@ public abstract class CodePrimitive<T> {
 
     public abstract String getTypeStrRepresenation();
 
+    public T getData() {
+        return data;
+    }
+
 
 
     public CodePrimitive (String tokenRepresentation, T data) {
         this.tokenRepresentation = tokenRepresentation;
-        this.allowedClasses = new HashSet<>();
         this.data = data;
     }
 
-    protected Set<Class<? extends CodePrimitive>> allowedClasses;
 
 
     public abstract String toString();
-    public abstract boolean equals(Object obj);
+
     public abstract CodePrimitive add(CodePrimitive other);
     public abstract CodePrimitive subtract(CodePrimitive other);
     public abstract CodePrimitive multiply(CodePrimitive other);
     public abstract CodePrimitive divide(CodePrimitive other);
     public abstract CodePrimitive modulo(CodePrimitive other);
-    public abstract CodePrimitive increment(CodePrimitive other);
-    public abstract CodePrimitive decrement(CodePrimitive other);
     public abstract CodeBoolean and(CodePrimitive other);
     public abstract CodeBoolean or(CodePrimitive other);
     public abstract CodeBoolean not();
     public abstract CodeBoolean bool();
+
+    public abstract CodeBoolean lessThan(CodePrimitive other);
+    public abstract CodeBoolean greaterThan(CodePrimitive other);
+    public abstract CodeBoolean lessThanEqualTo(CodePrimitive other);
+    public abstract CodeBoolean greaterThanEqualTo(CodePrimitive other);
+    public abstract CodeBoolean equalTo(CodePrimitive other);
+
+
+    /**
+     * Converts a native implementation of a primitive data type to a CODE primitive data type.
+     * Can only convert Integer, Double, String, and Boolean.
+     */
+    public static final CodePrimitive fromNativeImplementation(Object o) {
+        if (o instanceof Integer i) {
+            return new CodeInteger(i);
+        } else if (o instanceof Double d) {
+            return new CodeFloat(d);
+        } else if (o instanceof String s) {
+            return new CodeString(s);
+        } else if (o instanceof Boolean b) {
+            return b ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+        } throw new PrimitiveInitializationError(o.getClass().getSimpleName());
+    }
+
+    public CodePrimitive notEqualTo(CodePrimitive other) {
+        return this.equalTo(other).not();
+    }
 
 }

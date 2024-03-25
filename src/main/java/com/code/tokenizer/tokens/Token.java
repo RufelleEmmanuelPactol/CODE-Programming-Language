@@ -1,18 +1,15 @@
 package com.code.tokenizer.tokens;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class Token {
-    protected static Set<String> members = new HashSet<>();
 
-    public static boolean isMember(String keyword) {
-        return members.contains(keyword);
-    }
 
-    public static Token createMemberIfValid(String keyword) {
-        return null;
-    }
+
+
+
 
     public Token(String representation) {
         this.tokenAsString = representation;
@@ -23,6 +20,15 @@ public abstract class Token {
     }
     private final String tokenAsString;
 
+    @Override
+    public boolean equals(Object o) {
+        return this.tokenAsString.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tokenAsString);
+    }
 
     public String toString() {
         return this.getClass().getCanonicalName() + "(" + getTokenAsString() + ")";

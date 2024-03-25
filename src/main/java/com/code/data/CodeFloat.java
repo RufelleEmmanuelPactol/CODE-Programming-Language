@@ -1,11 +1,18 @@
 package com.code.data;
 
-import static com.code.data.CodeBoolean.FALSE;
-import static com.code.data.CodeBoolean.TRUE;
+import com.code.errors.runtime.TypeError;
 
-public class CodeFloat extends CodePrimitive<Float>{
+public class CodeFloat extends CodeNumeric<Double> {
     public CodeFloat(String data) {
-        super(data, Float.parseFloat(data));
+        super(data, Double.parseDouble(data));
+    }
+
+    public CodeFloat() {
+        super("0", 0.0);
+    }
+
+    public CodeFloat(Double data) {
+        super(data.toString(), data);
     }
 
     @Override
@@ -15,66 +22,128 @@ public class CodeFloat extends CodePrimitive<Float>{
 
     @Override
     public String toString() {
-        return null;
+        return tokenRepresentation;
     }
 
     @Override
     public boolean equals(Object obj) {
+        if (obj instanceof CodeFloat) {
+            CodeFloat other = (CodeFloat) obj;
+            return this.data.equals(other.data);
+        }
         return false;
     }
 
     @Override
     public CodePrimitive add(CodePrimitive other) {
-        return null;
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return new CodeFloat(this.data + i.data);
+            } else if (other instanceof CodeFloat f) {
+                return new CodeFloat(this.data + f.data);
+            }
+        }
+        throw new TypeError(this, other, "+");
     }
 
     @Override
     public CodePrimitive subtract(CodePrimitive other) {
-        return null;
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return new CodeFloat(this.data - i.data);
+            } else if (other instanceof CodeFloat f) {
+                return new CodeFloat(this.data - f.data);
+            }
+        }
+        throw new TypeError(this, other, "-");
     }
 
     @Override
     public CodePrimitive multiply(CodePrimitive other) {
-        return null;
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return new CodeFloat(this.data * i.data);
+            } else if (other instanceof CodeFloat f) {
+                return new CodeFloat(this.data * f.data);
+            }
+        }
+        throw new TypeError(this, other, "*");
     }
 
     @Override
     public CodePrimitive divide(CodePrimitive other) {
-        return null;
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return new CodeFloat(this.data / i.data);
+            } else if (other instanceof CodeFloat f) {
+                return new CodeFloat(this.data / f.data);
+            }
+        }
+        throw new TypeError(this, other, "/");
     }
 
     @Override
     public CodePrimitive modulo(CodePrimitive other) {
-        return null;
-    }
-
-    @Override
-    public CodePrimitive increment(CodePrimitive other) {
-        return null;
-    }
-
-    @Override
-    public CodePrimitive decrement(CodePrimitive other) {
-        return null;
-    }
-
-    @Override
-    public CodeBoolean and(CodePrimitive other) {
-        return null;
-    }
-
-    @Override
-    public CodeBoolean or(CodePrimitive other) {
-        return null;
-    }
-
-    @Override
-    public CodeBoolean not() {
-        return null;
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return new CodeFloat(this.data % i.data);
+            } else if (other instanceof CodeFloat f) {
+                return new CodeFloat(this.data % f.data);
+            }
+        }
+        throw new TypeError(this, other, "%");
     }
 
     @Override
     public CodeBoolean bool() {
-        return data == 0 ? FALSE : TRUE;
+        return data == 0 ? CodeBoolean.FALSE : CodeBoolean.TRUE;
+    }
+
+    @Override
+    public CodeBoolean lessThan(CodePrimitive other) {
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return this.data < i.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            } else if (other instanceof CodeFloat f) {
+                return this.data < f.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            }
+        }
+        throw new TypeError(this, other, "<");
+    }
+
+    @Override
+    public CodeBoolean greaterThan(CodePrimitive other) {
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return this.data > i.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            } else if (other instanceof CodeFloat f) {
+                return this.data > f.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            }
+        }
+        throw new TypeError(this, other, ">");
+    }
+
+    @Override
+    public CodeBoolean lessThanEqualTo(CodePrimitive other) {
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return this.data <= i.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            } else if (other instanceof CodeFloat f) {
+                return this.data <= f.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            }
+        }
+        throw new TypeError(this, other, "<=");
+    }
+
+    @Override
+    public CodeBoolean greaterThanEqualTo(CodePrimitive other) {
+        if (other instanceof CodeNumeric<?>) {
+            if (other instanceof CodeInteger i) {
+                return this.data >= i.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            } else if (other instanceof CodeFloat f) {
+                return this.data >= f.data ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            }
+        }
+        throw new TypeError(this, other, ">=");
     }
 }

@@ -1,6 +1,13 @@
 package com.code.parser.nodes;
 
+import com.code.errors.runtime.TypeError;
+import com.code.parser.engine.SymbolTable;
 import com.code.tokenizer.tokens.Token;
+import com.code.virtualmachine.CodeClass;
+import com.code.virtualmachine.CodeObject;
+import com.code.virtualmachine.CodeRuntime;
+import com.code.virtualmachine.NullType;
+
 import java.util.List;
 
 public class VariableDeclarationNode extends ASTNode {
@@ -40,4 +47,27 @@ public class VariableDeclarationNode extends ASTNode {
         sb.append(";");
         return sb.toString();
     }
+
+    @Override
+    public CodeObject execute() {
+        for (VarDeclaration declaration : declarations) {
+            if (declaration.initializer != null) {
+                CodeObject value = declaration.initializer.execute();
+                typeChecking(value);
+                CodeRuntime.getRuntime().runtimeSymbolTable.add(declaration.name.getTokenAsString(), value);
+            } else {
+                CodeClass dataRep =CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(type.getTokenAsString());
+                CodeRuntime.getRuntime().runtimeSymbolTable.add(declaration.name.getTokenAsString(), dataRep.initialize());
+            }
+        } return CodeClass.getNull();
+    }
+
+    private void typeChecking(CodeObject obj){
+        CodeClass clazz = (CodeClass)CodeRuntime.getRuntime().runtimeSymbolTable.search(type.getTokenAsString());
+        if (!clazz.getDataType().isInstance(obj.getInstance())){
+            throw new TypeError(clazz.getDataTypeName(), obj.getCodeClass().getDataTypeName(), "assignment");
+        }
+    }
+
+
 }

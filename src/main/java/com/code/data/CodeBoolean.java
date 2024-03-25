@@ -9,6 +9,13 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
     public static final CodeBoolean TRUE = new CodeBoolean("TRUE", true);
     public static final CodeBoolean FALSE = new CodeBoolean("FALSE", false);
 
+    public CodeBoolean (Boolean b) {
+        super(b ? "TRUE" : "FALSE", b ? true : false);
+    }
+
+    public CodeBoolean() {
+        super("FALSE", false);
+    }
 
     @Override
     public String getTypeStrRepresenation() {
@@ -50,15 +57,6 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
         return null;
     }
 
-    @Override
-    public CodePrimitive increment(CodePrimitive other) {
-        return null;
-    }
-
-    @Override
-    public CodePrimitive decrement(CodePrimitive other) {
-        return null;
-    }
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -80,5 +78,30 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
     @Override
     public CodeBoolean bool() {
         return this;
+    }
+
+    @Override
+    public CodeBoolean lessThan(CodePrimitive other) {
+        return null;
+    }
+
+    @Override
+    public CodeBoolean greaterThan(CodePrimitive other) {
+        return null;
+    }
+
+    @Override
+    public CodeBoolean lessThanEqualTo(CodePrimitive other) {
+        return null;
+    }
+
+    @Override
+    public CodeBoolean greaterThanEqualTo(CodePrimitive other) {
+        return null;
+    }
+
+    @Override
+    public CodeBoolean equalTo(CodePrimitive other) {
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package com.code.parser.nodes;
 
 import com.code.tokenizer.tokens.Token;
+import com.code.virtualmachine.CodeObject;
 
 public abstract class ASTNode {
     protected Token value;
@@ -15,4 +16,6 @@ public abstract class ASTNode {
     public Token getValue() {
         return value;
     }
+
+    public abstract CodeObject execute();
 }

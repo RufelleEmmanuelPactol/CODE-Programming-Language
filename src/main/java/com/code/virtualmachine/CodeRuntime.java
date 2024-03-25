@@ -1,14 +1,9 @@
 package com.code.virtualmachine;
 
-import com.code.exceptions.compile.NoStartError;
+import com.code.errors.compile.NoStartError;
 import com.code.parser.engine.SymbolTable;
-import com.code.tokenizer.LeximCursor;
-import com.code.tokenizer.TokenCursor;
-import com.code.tokenizer.tokens.BeginStatement;
-import com.code.tokenizer.tokens.CodeBlock;
-import com.code.tokenizer.tokens.Token;
-
-import java.util.ArrayList;
+import com.code.parser.nodes.ASTNode;
+import com.code.parser.nodes.CodeBlockNode;
 
 /**
  * The Runtime class is the class that manages the runtime of the virtual machine.
@@ -19,13 +14,13 @@ import java.util.ArrayList;
 public class CodeRuntime {
 
     public SymbolTable runtimeSymbolTable;
+    public void popSymbolTable() {
+        runtimeSymbolTable = runtimeSymbolTable.getParent();
+    }
 
-
-
-
-
-
-
+    public void pushSymbolTable() {
+        runtimeSymbolTable = new SymbolTable(runtimeSymbolTable);
+    }
 
 
 
@@ -56,5 +51,14 @@ public class CodeRuntime {
      */
     public void runUsingMainThread(Runnable process)  {
         GLOBAL_THREAD.createProcess(process);
+    }
+
+    public void runMain() {
+        CodeBlockNode mainFunction = (CodeBlockNode) runtimeSymbolTable.search("CODE");
+        if (mainFunction == null) {
+            throw new NoStartError();
+        } for (ASTNode statement : mainFunction.getStatements()) {
+            statement.execute();
+        }
     }
 }

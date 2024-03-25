@@ -11,6 +11,10 @@ public class CodeBlockNode extends BlockNode {
     protected final List<ASTNode> statements;
     protected SymbolTable symbolTable;
 
+    public List<ASTNode> getStatements() {
+        return statements;
+    }
+
     public Token getName() {
         return name;
     }

@@ -1,6 +1,7 @@
 package com.code.parser.engine;
 
-import com.code.exceptions.compile.ParseError;
+import com.code.data.CodeString;
+import com.code.errors.compile.ParseError;
 import com.code.parser.nodes.*;
 import com.code.tokenizer.TokenCursor;
 import com.code.tokenizer.tokens.*;
@@ -45,7 +46,15 @@ public class RecursiveDescentParser {
         Token current = currentCursor.current();
         if (current instanceof DataType) {
             expr = parseDeclaration();
-        } else {
+        } else if (current instanceof IntrinsicDisplay) {
+            eat(IntrinsicDisplay.class);
+            eat(Colon.class);
+            expr = new DisplayNode(current, parseExpression());
+        } else if (current instanceof IntrinsicScan) {
+            eat(IntrinsicScan.class);
+            eat(Colon.class);
+            expr = new ScanNode(current, parseVariadic());
+        }else {
             expr = parseExpression();
         } if (expr instanceof BlockEndNode){
             return expr;
@@ -103,7 +112,16 @@ public class RecursiveDescentParser {
         while (currentCursor.current() instanceof MultiTypeOperator) {
             Token operator = currentCursor.current();
             eat(MultiTypeOperator.class);
-            left = new FactorNode(left, operator, parseTerm());
+            if (operator instanceof FlushToken) {
+                if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof ValueToken) {
+                    // here a newline can also be the last line
+                    left = new TermNode(left, operator, parseTerm());
+                } else {
+                    // append an empty String token to the right
+                    left = new TermNode(left, operator, new FactorNode(null, new ValueToken(new CodeString("")), null));
+                }
+            }
+            left = new TermNode(left, operator, parseTerm());
         }
         return left;
     }
@@ -111,10 +129,9 @@ public class RecursiveDescentParser {
     protected ASTNode parseTerm() {
         ASTNode left = parseFactor();
         while (currentCursor.current() instanceof TermToken) {
-
             Token operator = currentCursor.current();
             eat(TermToken.class);
-            left = new FactorNode(left, operator, parseFactor());
+            left = new TermNode(left, operator, parseFactor());
         } return left;
     }
 
@@ -128,7 +145,12 @@ public class RecursiveDescentParser {
             ASTNode result = parseExpression();
             eat(RightParen.class);
             return result;
-        } else if (current instanceof MultiTypeOperator) {
+        }  else if (current instanceof FlushToken nn) {
+            ASTNode node = new TermNode(null, nn, null);
+            eat(FlushToken.class);
+            return node;
+        }
+        else if (current instanceof MultiTypeOperator) {
             eat(MultiTypeOperator.class);
             return new UnaryNode(current, parseFactor());
         } else if (current instanceof NonTerminals) {
@@ -139,6 +161,14 @@ public class RecursiveDescentParser {
             return new BlockEndNode();
         } else if (current instanceof NewLine) {
             return null;
+        } else if (current instanceof LeftBracket) {
+            eat(LeftBracket.class);
+            ASTNode node = parseExpression();
+            eat(RightBracket.class);
+            return node;
+        } else if (current instanceof UnaryOperator un) {
+            eat(UnaryOperator.class);
+            return new UnaryNode(un, parseFactor());
         }
         else
         throw new RuntimeException("[ParseError]: Expected ValueToken or LeftParen but got " + current.getClass().getSimpleName() +".");
@@ -245,6 +275,30 @@ public class RecursiveDescentParser {
         }
 
         return parameters;
+    }
+
+    protected VariadicNode parseVariadic() {
+        List<NonTerminalFactorNode> args = new ArrayList<>();
+
+        do {
+            Token current = currentCursor.current();
+            if (current instanceof NonTerminals) {
+                args.add(new NonTerminalFactorNode(null, current, null));
+                currentCursor.next(); // Move to the next token
+
+                // Check if there's a separator, indicating more identifiers to come
+                if (currentCursor.current() instanceof Separator) {
+                    currentCursor.next(); // Consume the separator and continue
+                } else {
+                    break; // No more identifiers to parse
+                }
+            } else {
+                // If the current token is not a NonTerminals, it's an unexpected token in this context
+                throw new ParseError("Expected an identifier but got " + current.getClass().getSimpleName() + ".");
+            }
+        } while (true);
+
+        return new VariadicNode(args);
     }
 
 }

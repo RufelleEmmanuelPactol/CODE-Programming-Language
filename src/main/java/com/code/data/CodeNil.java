@@ -1,6 +1,9 @@
 package com.code.data;
 
+import com.code.errors.runtime.TypeError;
+
 public class CodeNil extends CodePrimitive<Object>{
+
 
     public static final CodeNil nil = new CodeNil("nil");
 
@@ -18,63 +21,76 @@ public class CodeNil extends CodePrimitive<Object>{
         return "NIL";
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return false;
-    }
 
     @Override
     public CodePrimitive add(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "+");
     }
 
     @Override
     public CodePrimitive subtract(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "-");
     }
 
     @Override
     public CodePrimitive multiply(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "*");
     }
 
     @Override
     public CodePrimitive divide(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "/");
     }
 
     @Override
     public CodePrimitive modulo(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "%");
     }
 
-    @Override
-    public CodePrimitive increment(CodePrimitive other) {
-        return null;
-    }
 
-    @Override
-    public CodePrimitive decrement(CodePrimitive other) {
-        return null;
-    }
 
     @Override
     public CodeBoolean and(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "AND");
     }
 
     @Override
     public CodeBoolean or(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "OR");
     }
 
     @Override
     public CodeBoolean not() {
-        return null;
+        return CodeBoolean.TRUE;
     }
 
     @Override
     public CodeBoolean bool() {
         return CodeBoolean.FALSE;
+    }
+
+    @Override
+    public CodeBoolean lessThan(CodePrimitive other) {
+        throw new TypeError(this, other, "<");
+    }
+
+    @Override
+    public CodeBoolean greaterThan(CodePrimitive other) {
+        throw new TypeError(this, other, ">");
+    }
+
+    @Override
+    public CodeBoolean lessThanEqualTo(CodePrimitive other) {
+        throw new TypeError(this, other, "<=");
+    }
+
+    @Override
+    public CodeBoolean greaterThanEqualTo(CodePrimitive other) {
+        throw new TypeError(this, other, ">=");
+    }
+
+    @Override
+    public CodeBoolean equalTo(CodePrimitive other) {
+        return other instanceof CodeNil ? CodeBoolean.TRUE : CodeBoolean.FALSE;
     }
 }

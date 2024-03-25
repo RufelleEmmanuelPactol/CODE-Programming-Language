@@ -1,5 +1,7 @@
 package com.code.tokenizer;
 
+import com.code.data.CodeBoolean;
+import com.code.data.CodeFloat;
 import com.code.data.CodeInteger;
 import com.code.data.CodeString;
 import com.code.tokenizer.tokens.*;
@@ -24,6 +26,7 @@ public class TokenFactory {
     // This allows the class to function as a singleton, but not necessarily locked as a singleton.
     protected static void initializeOperators() {
         addBinaryOperator(">");
+        addBinaryOperator("<");
         addBinaryOperator(">=");
         addBinaryOperator("<");
         addBinaryOperator("<=");
@@ -33,8 +36,14 @@ public class TokenFactory {
         addBinaryOperator("AND");
         addBinaryOperator("OR");
         addUnaryOperator("NOT");
+        addUnaryOperator("CAST_BOOL");
+        addUnaryOperator("CAST_STRING");
+        addUnaryOperator("CAST_INT");
+        addUnaryOperator("CAST_FLOAT");
+        factoryMaster.put("$", FlushToken.class);
         factoryMaster.put("*", TermToken.class);
         factoryMaster.put("/", TermToken.class);
+        factoryMaster.put("&", TermToken.class);
         factoryMaster.put("+", MultiTypeOperator.class);
         factoryMaster.put("-", MultiTypeOperator.class);
         factoryMaster.put("[", LeftBracket.class);
@@ -61,7 +70,7 @@ public class TokenFactory {
         addDataType("STRING");
         addDataType("BOOL");
         addDataType("FLOAT");
-        addDataType("VAR");
+        addDataType("OBJECT");
         addDataType("MAP");
         addDataType("LIST");
     }
@@ -71,15 +80,35 @@ public class TokenFactory {
     }
 
     protected Token terminalExpressionMatch(String str) {
-        
+        // Handle integer literals
         if (str.matches("\\d+")) {
             return new ValueToken(new CodeInteger(str));
-        } if (str.matches("\".*\"")) {
-            return new ValueToken(new CodeString(str));
-        } else {
+        }
+        // Handle double literals, including optional sign and exponential notation
+        else if (str.matches("[+-]?\\d*\\.\\d+([eE][+-]?\\d+)?")) {
+            CodeFloat fl = new CodeFloat(str);
+            return new ValueToken(fl);
+        }
+        // Handle string literals
+        else if (str.matches("\".*\"")) {
+            var data = str;
+            if (data.length() == 3) {
+                data = data.substring(1, data.length() - 1);
+                return new ValueToken(new CodeString(data));
+            }
+            // Update the data to remove the escape characters
+            data = data.substring(1, data.length() - 1).replaceAll("\\\\(.)", "$1");
+            return new ValueToken(new CodeString(data));
+        }
+        // Handle boolean literals
+        else if (str.matches("TRUE|FALSE")) {
+            return new ValueToken(new CodeBoolean(str.equals("TRUE")));
+        }
+        else {
             return null;
         }
     }
+
 
 
     private static void addBinaryOperator(String operator) {

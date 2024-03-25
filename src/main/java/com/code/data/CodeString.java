@@ -1,20 +1,19 @@
 package com.code.data;
 
-import com.code.exceptions.runtime.TypeError;
+import com.code.errors.runtime.TypeError;
 
 import java.util.HashSet;
 
 public class CodeString extends CodePrimitive<String>{
     public CodeString(String data) {
         super(data, data);
-        this.allowedClasses = new HashSet<>();
-        this.allowedClasses.add(CodeString.class);
-        // update the data to remove the escape characters
-        // escape characters are basically /, and retain the character after it
-        // also remove the starting and trailing ""
-        this.data = data.substring(1, data.length() - 1).replaceAll("\\\\(.)", "$1");
+
         this.tokenRepresentation = data;
 
+    }
+
+    public CodeString(){
+        super("", "");
     }
 
     @Override
@@ -35,49 +34,36 @@ public class CodeString extends CodePrimitive<String>{
     @Override
     @SuppressWarnings("rawtypes")
     public CodePrimitive add(CodePrimitive other) {
-        if (allowedClasses.contains(other.getClass())){
             if (other instanceof CodeString) {
-                return new CodeString(this.data + (String)other.data);
+                return new CodeString(this.data + other.data);
             }
-        }
-        throw new TypeError(this, other, "+");
+        throw new TypeError(this, other, "&");
     }
 
     @Override
     @SuppressWarnings("rawtypes")
     public CodePrimitive subtract(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "-");
     }
 
     @Override
     @SuppressWarnings("rawtypes")
     public CodePrimitive multiply(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "*");
     }
 
     @Override
     @SuppressWarnings("rawtypes")
     public CodePrimitive divide(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "/");
     }
 
     @Override
     @SuppressWarnings("rawtypes")
     public CodePrimitive modulo(CodePrimitive other) {
-        return null;
+        throw new TypeError(this, other, "%");
     }
 
-    @Override
-    @SuppressWarnings("rawtypes")
-    public CodePrimitive increment(CodePrimitive other) {
-        return null;
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public CodePrimitive decrement(CodePrimitive other) {
-        return null;
-    }
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -93,12 +79,36 @@ public class CodeString extends CodePrimitive<String>{
 
     @Override
     public CodeBoolean not() {
-        if (this.data.isEmpty()) return CodeBoolean.TRUE;
-        return CodeBoolean.FALSE;
+        return bool().not();
     }
 
     @Override
     public CodeBoolean bool() {
-        return this.not();
+        return this.data.isEmpty() ? CodeBoolean.FALSE : CodeBoolean.TRUE;
+    }
+
+    @Override
+    public CodeBoolean lessThan(CodePrimitive other) {
+        throw new TypeError(this, other, "<");
+    }
+
+    @Override
+    public CodeBoolean greaterThan(CodePrimitive other) {
+        throw new TypeError(this, other, ">");
+    }
+
+    @Override
+    public CodeBoolean lessThanEqualTo(CodePrimitive other) {
+        throw new TypeError(this, other, "<=");
+    }
+
+    @Override
+    public CodeBoolean greaterThanEqualTo(CodePrimitive other) {
+        throw new TypeError(this, other, ">=");
+    }
+
+    @Override
+    public CodeBoolean equalTo(CodePrimitive other) {
+        return other.getData().equals(this.data) ? CodeBoolean.TRUE : CodeBoolean.FALSE;
     }
 }

@@ -1,6 +1,6 @@
 package com.code.tokenizer;
 
-import com.code.exceptions.compile.ParseError;
+import com.code.errors.compile.ParseError;
 import com.code.tokenizer.tokens.NewLine;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeRuntime;

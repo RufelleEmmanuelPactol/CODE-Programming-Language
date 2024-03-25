@@ -18,11 +18,12 @@ public class LeximCursor implements Iterable<String> {
         lexims = new ArrayList<>();
         ArrayList<String> tokens = new ArrayList<>();
         // Updated pattern string to handle escaped quotes within quoted strings and ensure operators are matched correctly
-        String patternString = "(\"(?:\\\\\"|[^\"])*?\")" +
-                "|(>=|<=|==|\\+\\+|--|\\+|-|/|\\*|>|%)|" +
-                "([()=;.,:{}#])|" +
-                "(\\d+)|" +
-                "([\\w&|]+)";
+        String patternString = "(\"(?:\\\\\"|[^\"])*?\")" +               // Matches string literals
+                "|(>=|<=|<|==|\\+\\+|--|\\+|-|/|\\*|>|%)|" +        // Matches operators
+                "([()=;.,:{}#$])|" +                             // Matches single character symbols
+                "(\\d+\\.\\d+|\\d+)|" +                          // Matches floating-point numbers and integers
+                "([\\w&|]+)";                                    // Matches words (identifiers and keywords)
+
 
 
         Pattern pattern = Pattern.compile(patternString);

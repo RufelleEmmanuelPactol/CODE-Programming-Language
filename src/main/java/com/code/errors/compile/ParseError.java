@@ -1,6 +1,6 @@
-package com.code.exceptions.compile;
+package com.code.errors.compile;
 
-import com.code.exceptions.CodeError;
+import com.code.errors.CodeError;
 
 public class ParseError extends CodeError {
     public ParseError(String message) {
