@@ -8,16 +8,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
+/**
+ * The CodeClass class is a representation of a class in the CODE. It is used to create instances of classes and
+ * to store information about the class.
+ */
 public class CodeClass {
 
     private static CodeObject nullType;
 
-    public static CodeObject inferInstance(Object instance) {
-        String name = instance.getClass().getSimpleName();
-        name = CodeRuntime.getRuntime().runtimeSymbolTable.getCanonicalName(name);
-        CodeClass o = (CodeClass)CodeRuntime.getRuntime().runtimeSymbolTable.search(name);
-        return o.fromInstance(instance);
-    }
 
     public static final CodeObject getNull(){
         return nullType;
@@ -26,6 +24,11 @@ public class CodeClass {
     private String dataTypeName;
     private Class<?> dataType;
 
+    /**
+     * Creates a new CodeClass object with the given data type name and data type.
+     * @param dataTypeName The name of the data type.
+     * @param dataType The data type.
+     */
     public CodeClass(String dataTypeName, Class<?> dataType) {
         this.dataTypeName = dataTypeName;
         this.dataType = dataType;
@@ -33,11 +36,17 @@ public class CodeClass {
         CodeRuntime.getRuntime().runtimeSymbolTable.registerClass(dataTypeName, this);
     }
 
+
     protected CodeClass (String dataTypeName, Class<?> dataType, boolean optional) {
         this.dataTypeName = dataTypeName;
         this.dataType = dataType;
     }
 
+    /**
+     * This creates a class without type checking. Type checking is defined as
+     * the process of verifying and enforcing whether a given data type is already
+     * defined in the scope.
+     */
     public static CodeClass classWithoutTypeChecking(String dataTypeName, Class<?> dataType){
         return new CodeClass(dataTypeName, dataType, true);
     }

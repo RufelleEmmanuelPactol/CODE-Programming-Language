@@ -8,6 +8,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The CodeObject class is a representation of an object in the CODE. It is used to store information about the object
+ * and to perform operations on the object.
+ */
 public class CodeObject {
     private Object instance;
     private String name;
@@ -62,6 +66,10 @@ public class CodeObject {
     }
 
 
+    /**
+     * Invoke a method on the object with the given name and arguments.
+     * This allows the object to invoke Java methods, acting as an interface between CODELang and the JVM.
+     */
     public Object invokeMethod(String methodName, CodeObject... args) {
         try {
             List<Object> argList = new ArrayList<>();

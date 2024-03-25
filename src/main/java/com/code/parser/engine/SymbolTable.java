@@ -18,6 +18,10 @@ public class SymbolTable {
 
 
 
+    /**
+     * Register a class in the symbol table. This method will
+     * throw an error if the class already exists in the symbol table.
+     */
     public void registerClass(String name, CodeClass instance) {
         String canonicalName = getCanonicalName(name);
         if (canonicalName != null) {
@@ -53,6 +57,9 @@ public class SymbolTable {
         throw new ClassDoesNotExistError(name);
     }
 
+    /**
+     * Register an object in the symbol table if it does not exist.
+     */
     public void registerIfNotExists(Object o) {
         String name = o.getClass().getSimpleName();
         String cannon = getCanonicalName(name);
@@ -75,6 +82,9 @@ public class SymbolTable {
         this.parent = parent;
     }
 
+    /**
+     * Search for a key in the symbol table.
+     */
     public Object search(String key) {
         if (symbol.containsKey(key)) {
             return symbol.get(key);
@@ -85,6 +95,10 @@ public class SymbolTable {
         }
     }
 
+    /**
+     * Search for a key in the symbol table. This differs from
+     * search in that it throws an error if the key is not found.
+     */
     public Object searchAssert(String key) {
         String name = canonicalNames.get(key);
         key = name != null ? name : key;
@@ -128,6 +142,10 @@ public class SymbolTable {
 
     }
 
+    /**
+     * Get a canonical class by name. A canonical class is a class that is defined in the language.
+     * It replaces Java's class name with the language's class name.
+     */
     public Class<?> getCanonicalClass(String name){
         initCanonicalClass();
         Object result = search(name);
@@ -142,6 +160,9 @@ public class SymbolTable {
         return null;
     }
 
+    /**
+     * Add a new object to the symbol table.
+     */
     public void add(String key, Object value) {
         if (value instanceof CodeObject) {
             key = getCanonicalName(key);
