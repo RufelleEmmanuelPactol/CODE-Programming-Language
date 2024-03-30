@@ -11,14 +11,16 @@ public class CodeNil extends CodePrimitive<Object>{
         super(tokenRepresentation, null);
     }
 
+
+
     @Override
     public String getTypeStrRepresenation() {
-        return "NIL";
+        return "NULL_TYPE";
     }
 
     @Override
     public String toString() {
-        return "NIL";
+        return "NULL_TYPE";
     }
 
 

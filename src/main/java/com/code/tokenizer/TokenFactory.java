@@ -40,21 +40,20 @@ public class TokenFactory {
         addUnaryOperator("CAST_STRING");
         addUnaryOperator("CAST_INT");
         addUnaryOperator("CAST_FLOAT");
+        factoryMaster.put("@NATIVE", ImportNativeToken.class);
         factoryMaster.put("$", FlushToken.class);
         factoryMaster.put("*", TermToken.class);
         factoryMaster.put("/", TermToken.class);
         factoryMaster.put("&", TermToken.class);
         factoryMaster.put("+", MultiTypeOperator.class);
         factoryMaster.put("-", MultiTypeOperator.class);
-        factoryMaster.put("[", LeftBracket.class);
-        factoryMaster.put("]", RightBracket.class);
         factoryMaster.put("FUNCTION", FunctionBlock.class);
         factoryMaster.put("IF", IfBlock.class);
         factoryMaster.put("CODE", CodeBlock.class);
         factoryMaster.put("DISPLAY", IntrinsicDisplay.class);
         factoryMaster.put("SCAN", IntrinsicScan.class);
-        factoryMaster.put(";", Separator.class);
-        factoryMaster.put(".", DotOperator.class);
+        factoryMaster.put(";", SemicolonToken.class);
+        factoryMaster.put(".", BinaryOperator.class);
         factoryMaster.put("=", AssignmentToken.class);
         factoryMaster.put("(", LeftParen.class);
         factoryMaster.put(")", RightParen.class);
@@ -66,13 +65,14 @@ public class TokenFactory {
         factoryMaster.put("{", LeftBrace.class);
         factoryMaster.put("}", RightBrace.class);
         factoryMaster.put("\n", NewLine.class);
+        factoryMaster.put("THREADED", ThreadedToken.class);
+        factoryMaster.put("RETURN", ReturnToken.class);
         addDataType("INT");
         addDataType("STRING");
         addDataType("BOOL");
         addDataType("FLOAT");
         addDataType("OBJECT");
-        addDataType("MAP");
-        addDataType("LIST");
+        addDataType("CHAR");
     }
 
     protected static void addDataType(String type) {
@@ -82,32 +82,57 @@ public class TokenFactory {
     protected Token terminalExpressionMatch(String str) {
         // Handle integer literals
         if (str.matches("\\d+")) {
-            return new ValueToken(new CodeInteger(str));
+            return new ValueToken(new CodeInteger(Integer.parseInt(str)));
         }
         // Handle double literals, including optional sign and exponential notation
         else if (str.matches("[+-]?\\d*\\.\\d+([eE][+-]?\\d+)?")) {
-            CodeFloat fl = new CodeFloat(str);
-            return new ValueToken(fl);
+            return new ValueToken(new CodeFloat(Double.parseDouble(str)));
         }
         // Handle string literals
         else if (str.matches("\".*\"")) {
-            var data = str;
-            if (data.length() == 3) {
-                data = data.substring(1, data.length() - 1);
-                return new ValueToken(new CodeString(data));
-            }
-            // Update the data to remove the escape characters
-            data = data.substring(1, data.length() - 1).replaceAll("\\\\(.)", "$1");
-            return new ValueToken(new CodeString(data));
+            return new ValueToken(new CodeString(str));
         }
         // Handle boolean literals
         else if (str.matches("TRUE|FALSE")) {
-            return new ValueToken(new CodeBoolean(str.equals("TRUE")));
+            return new ValueToken(new CodeBoolean(Boolean.parseBoolean(str)));
+        }
+        // These brackets allow the display of one character.
+        else if (str.matches("\\[.\\]")) {
+            return new ValueToken(new CodeString(str));
         }
         else {
             return null;
         }
     }
+
+    /**
+     * Extracts the inner content of a bracketed expression, handling nested or escaped brackets.
+     * @param str The input string with outer brackets.
+     * @param start The start index (after the first bracket).
+     * @param end The end index (before the last bracket).
+     * @return The extracted inner content as a string.
+     */
+    private String extractInnerContent(String str, int start, int end) {
+        StringBuilder contentBuilder = new StringBuilder();
+        int level = 0; // Level of nested brackets
+        for (int i = start; i < end; i++) {
+            char currentChar = str.charAt(i);
+            if (currentChar == '[') {
+                level++;
+            } else if (currentChar == ']') {
+                if (level == 0) {
+                    // Matching closing bracket for the initial level, add as escaped
+                    contentBuilder.append("\\]");
+                    continue;
+                } else {
+                    level--;
+                }
+            }
+            contentBuilder.append(currentChar);
+        }
+        return contentBuilder.toString().replaceAll("\\\\\\[", "[").replaceAll("\\\\\\]", "]"); // Unescape escaped brackets
+    }
+
 
 
 

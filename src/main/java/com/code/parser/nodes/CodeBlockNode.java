@@ -9,7 +9,6 @@ public class CodeBlockNode extends BlockNode {
     protected final List<ASTNode> args;
     protected final Token name;
     protected final List<ASTNode> statements;
-    protected SymbolTable symbolTable;
 
     public List<ASTNode> getStatements() {
         return statements;
@@ -19,10 +18,16 @@ public class CodeBlockNode extends BlockNode {
         return name;
     }
 
-    public CodeBlockNode(Token value, Token name, List<ASTNode> args, List<ASTNode> statements, SymbolTable parent) {
+    public List<ASTNode> getArgs() {
+        return args;
+    }
+
+    public CodeBlockNode(Token value, Token name, List<ASTNode> args, List<ASTNode> statements) {
         this.value = value;
         this.name = name;
         this.args = args;
         this.statements = statements;
     }
+
+
 }

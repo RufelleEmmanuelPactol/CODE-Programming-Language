@@ -1,5 +1,6 @@
 package com.code.virtualmachine;
 
+import com.code.data.CodePrimitive;
 import com.code.errors.runtime.FieldDoesNotExistError;
 import com.code.errors.runtime.TypeError;
 
@@ -25,7 +26,7 @@ public class CodeObject {
 
     // assign from raw value
     public CodeObject assign(Object value) {
-        CodeClass clazz = (CodeClass) CodeRuntime.getRuntime().runtimeSymbolTable.searchAssert(value.getClass().getSimpleName());
+        CodeClass clazz = this.getCodeClass();
         CodeObject obj = clazz.fromInstance(value);
         if (!codeClass.getClass().isInstance(obj.codeClass)) {
             throw new TypeError(obj, this, "assignment");
@@ -104,12 +105,14 @@ public class CodeObject {
 
 
     public String toString() {
-        return "code.lang.jvm."+ instance.getClass().getSimpleName() +"[" + instance.toString() + "]";
+        return "code.lang.object.Code"+ instance.getClass().getSimpleName() +"[" + instance.toString() + "]";
     }
 
     public Object getInstance() {
         return instance;
     }
+
+
 
 
 

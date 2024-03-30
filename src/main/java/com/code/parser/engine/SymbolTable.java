@@ -12,6 +12,19 @@ import java.util.HashMap;
 public class SymbolTable {
     protected SymbolTable parent;
 
+    private CodeObject returnedValue;
+
+    public void setReturnValue(CodeObject o) {
+        returnedValue = o;
+    }
+
+    public CodeObject getReturnedValue () {
+        returnedValue = returnedValue == null ? CodeClass.getNull() : returnedValue;
+        return returnedValue;
+    }
+
+
+
     public SymbolTable getParent(){
         return parent;
     }
@@ -126,6 +139,7 @@ public class SymbolTable {
         canonicalNames.put("null", "NULL");
         canonicalNames.put("Double", "FLOAT");
         canonicalNames.put("CodeNil", "NULL");
+        canonicalNames.put("CHAR", "STRING");
     }
 
     private static HashMap<String, Class<?>> canonicalClasses;
@@ -171,7 +185,7 @@ public class SymbolTable {
                 return;
             }
         }
-        if (search(key) != null) {
+        if (this.symbol.get(key) != null) {
             throw new NameShadowError(key);
         }
         symbol.put(key, value);

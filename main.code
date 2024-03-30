@@ -1,7 +1,15 @@
+@NATIVE ARRAY
+
+
+
+BEGIN FUNCTION display: INT x
+    DISPLAY: " World!"
+    RETURN x + 2
+END FUNCTION
 
 
 BEGIN CODE
-    FLOAT a = 32.123 * 2
-    DISPLAY: NOT CAST_BOOL (CAST_STRING 123 & CAST_STRING 3)
+    STRING x = "Hello"
+    DISPLAY: x
+    DISPLAY: display: 3; * 2
 END CODE
-

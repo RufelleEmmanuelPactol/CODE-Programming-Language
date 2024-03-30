@@ -1,6 +1,8 @@
 package com.code.parser.nodes;
 
 import com.code.data.CodeBoolean;
+import com.code.data.CodeFloat;
+import com.code.data.CodeInteger;
 import com.code.data.CodePrimitive;
 import com.code.parser.engine.SymbolTable;
 import com.code.tokenizer.tokens.Token;
@@ -33,11 +35,13 @@ public class UnaryNode extends ASTNode{
            }
         } else if (value.equals("-")) {
             Object instance = child.execute().getInstance();
-            if (instance instanceof Integer i) {
+            if (instance instanceof CodeInteger r) {
+                int i = r.getData();
                 Integer newVal = i > 0 ? -i : i;
                 return CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(newVal).initialize(newVal);
             } else {
-                Float newVal = -((Float) instance);
+
+                Double newVal = -((Double) ((CodeFloat)instance).getData());
                 return CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(newVal).initialize(newVal);
             }
         } else if (value.equals("NOT")) {

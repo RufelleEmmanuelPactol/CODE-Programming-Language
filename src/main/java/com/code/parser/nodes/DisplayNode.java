@@ -1,5 +1,6 @@
 package com.code.parser.nodes;
 
+import com.code.data.CodeNil;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeObject;
 

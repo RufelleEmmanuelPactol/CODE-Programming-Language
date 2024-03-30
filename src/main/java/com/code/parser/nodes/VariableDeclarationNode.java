@@ -1,12 +1,10 @@
 package com.code.parser.nodes;
 
 import com.code.errors.runtime.TypeError;
-import com.code.parser.engine.SymbolTable;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeClass;
 import com.code.virtualmachine.CodeObject;
 import com.code.virtualmachine.CodeRuntime;
-import com.code.virtualmachine.NullType;
 
 import java.util.List;
 
@@ -51,7 +49,7 @@ public class VariableDeclarationNode extends ASTNode {
     @Override
     public CodeObject execute() {
         for (VarDeclaration declaration : declarations) {
-            if (declaration.initializer != null) {
+                if (declaration.initializer != null) {
                 CodeObject value = declaration.initializer.execute();
                 typeChecking(value);
                 CodeRuntime.getRuntime().runtimeSymbolTable.add(declaration.name.getTokenAsString(), value);

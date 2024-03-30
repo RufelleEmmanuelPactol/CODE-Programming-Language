@@ -6,6 +6,10 @@ import com.code.virtualmachine.CodeObject;
 public class ParameterNode extends ASTNode{
     private final Token paramName;
 
+    public Token getParamName() {
+        return paramName;
+    }
+
     public ParameterNode(Token dataType, Token paramName) {
         this.value = dataType;
         this.paramName = paramName;

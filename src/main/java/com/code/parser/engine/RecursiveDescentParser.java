@@ -46,6 +46,16 @@ public class RecursiveDescentParser {
      */
     public void parseCompletely(){
         while (currentCursor.hasNext()) {
+
+            // parse top-line imports
+             if (currentCursor.current() instanceof ImportNativeToken inT) {
+                eat(ImportNativeToken.class);
+                var node = new NativeNode(this.currentCursor.current());
+                eat(NonTerminals.class);
+                node.execute();
+                continue;
+            }
+
             CodeBlockNode stmt = (CodeBlockNode) parseBlock();
             if (stmt == null) {
                 eat(NewLine.class);
@@ -72,13 +82,33 @@ public class RecursiveDescentParser {
             eat(IntrinsicDisplay.class);
             eat(Colon.class);
             expr = new DisplayNode(current, parseExpression());
-        } else if (current instanceof IntrinsicScan) {
+        }  else if (current instanceof IntrinsicScan) {
             eat(IntrinsicScan.class);
             eat(Colon.class);
             expr = new ScanNode(current, parseVariadic());
-        }else {
+        } else if (current instanceof ThreadedToken) {
+            eat(ThreadedToken.class);
+            expr = parseFunctionCall();
+            expr = new ThreadedFunctionCallNode((FunctionCallNode) expr);
+        } else if (current instanceof ReturnToken) {
+            eat(ReturnToken.class);
+            ASTNode retExpr = parseExpression();
+            expr = new ReturnNode(retExpr);
+        }
+        else if (current instanceof NonTerminals) {
+            if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof Colon) {
+                expr = parseFunctionCall();
+            } else if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof AssignmentToken) {
+                expr = parseAssignment();
+            }
+            else {
+                expr = parseExpression();
+            }
+        }
+        else {
             expr = parseExpression();
-        } if (expr instanceof BlockEndNode){
+        }
+        if (expr instanceof BlockEndNode){
             return expr;
         }
         eat(NewLine.class);
@@ -141,7 +171,7 @@ public class RecursiveDescentParser {
      *
      * @return an ASTNode representing the parsed expression
      */
-    protected ASTNode parseExpression() {
+    public ASTNode parseExpression() {
         ASTNode left = parseSimpleExpression();
         while (currentCursor.current() instanceof BinaryOperator) {
             Token current = currentCursor.current();
@@ -159,18 +189,26 @@ public class RecursiveDescentParser {
      */
     protected ASTNode parseSimpleExpression() {
         ASTNode left = parseTerm();
+
         while (currentCursor.current() instanceof MultiTypeOperator) {
             Token operator = currentCursor.current();
             eat(MultiTypeOperator.class);
+
+            // handle the flush operator
             if (operator instanceof FlushToken) {
-                if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof ValueToken) {
+                if (currentCursor.hasNext() ) {
                     // here a newline can also be the last line
-                    left = new TermNode(left, operator, parseTerm());
+                    ASTNode expr = parseExpression();
+                    left = new BinaryNode(left, operator,expr);
+                    continue;
                 } else {
                     // append an empty String token to the right
-                    left = new TermNode(left, operator, new FactorNode(null, new ValueToken(new CodeString("")), null));
+                    left = new BinaryNode(left, operator, new FactorNode(null, new ValueToken(new CodeString("")), null));
+                    continue;
                 }
             }
+
+
             left = new TermNode(left, operator, parseTerm());
         }
         return left;
@@ -209,14 +247,19 @@ public class RecursiveDescentParser {
             eat(RightParen.class);
             return result;
         }  else if (current instanceof FlushToken nn) {
-            ASTNode node = new TermNode(null, nn, null);
             eat(FlushToken.class);
+            ASTNode right = currentCursor.current() instanceof FlushToken ? null: parseExpression();
+            ASTNode node = new TermNode(null, nn,  right);
+
             return node;
         }
         else if (current instanceof MultiTypeOperator) {
             eat(MultiTypeOperator.class);
             return new UnaryNode(current, parseFactor());
         } else if (current instanceof NonTerminals) {
+            if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof Colon) {
+                return parseFunctionCall();
+            }
             eat(NonTerminals.class);
             return new NonTerminalFactorNode(null, current, null);
         }
@@ -319,7 +362,15 @@ public class RecursiveDescentParser {
 
 
 
-        return new CodeBlockNode(functionType, name, args, statements, CodeRuntime.getRuntime().runtimeSymbolTable);
+        return new CodeBlockNode(functionType, name, args, statements);
+    }
+
+    protected ASTNode parseAssignment() {
+        Token varName = currentCursor.current();
+        eat(NonTerminals.class); // Consuming the variable name token
+        eat(AssignmentToken.class); // Consuming the assignment '=' token
+        ASTNode expr = parseExpression(); // Parsing the expression to assign
+        return new AssignmentNode(new NonTerminalFactorNode(null, varName, null), expr);
     }
 
     /**
@@ -381,5 +432,71 @@ public class RecursiveDescentParser {
 
         return new VariadicNode(args);
     }
+
+    /**
+     * Parses the arguments of a function from the current cursor position. This method handles the parsing
+     * of function arguments, which may include identifiers, expressions, and variadic arguments.
+     *
+     * @return a list of ASTNodes representing the parsed function arguments
+     */
+    protected List<ASTNode> parseFunctionArgs() {
+        List<ASTNode> args = new ArrayList<>();
+        while (true) {
+            Token current = currentCursor.current();
+
+
+
+
+            // If the argument is a non-terminal (identifier)
+            if (current instanceof NonTerminals) {
+                args.add(new NonTerminalFactorNode(null, current, null));
+                currentCursor.next(); // Move to the next token
+            }
+            // If the argument is an expression
+            else {
+                ASTNode expr = parseExpression();
+                if (expr != null) {
+                    args.add(expr);
+                } else {
+                    // If parsing expression returned null, it means the current token didn't start an expression
+                    // This could be a parse error or a specific case where the argument list is empty or ends.
+                    break;
+                }
+            }
+
+            if (current instanceof SemicolonToken) {
+                break;
+            }
+
+            // After parsing an argument, check if the next token is a separator (comma), indicating more arguments
+            if (currentCursor.current() instanceof Separator) {
+                currentCursor.next(); // Consume the separator and continue to the next argument
+            } else {
+                // If there's no separator, it means we've reached the end of the arguments list
+                break;
+            }
+        }
+
+        // After parsing all arguments, check for variadic syntax (...) if your language syntax supports it
+        // This is just a placeholder check. Implement according to your language syntax for variadic arguments.
+        // if (currentCursor.current() instanceof VariadicToken) {
+        //    args.add(new VariadicNode(parseVariadicArguments()));
+        //    currentCursor.next();
+        // }
+
+        return args;
+    }
+
+    private ASTNode parseFunctionCall() {
+        Token functionName = currentCursor.current();
+        eat(NonTerminals.class); // Consume the function name token
+        eat(Colon.class);
+        List<ASTNode> parameters = parseFunctionArgs(); // Parse the function arguments
+        if (currentCursor.hasNext() && !( currentCursor.current() instanceof NewLine)) {
+            eat(SemicolonToken.class);
+        }
+        return new FunctionCallNode(functionName, parameters);
+    }
+
 
 }

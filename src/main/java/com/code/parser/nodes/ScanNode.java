@@ -5,6 +5,7 @@ import com.code.data.CodeInteger;
 import com.code.data.CodeString;
 import com.code.errors.runtime.TypeError;
 import com.code.tokenizer.tokens.Token;
+import com.code.virtualmachine.CodeClass;
 import com.code.virtualmachine.CodeObject;
 
 import java.util.List;
@@ -26,15 +27,15 @@ public class ScanNode extends ASTNode{
             CodeObject result = arg.execute();
             if (result.getInstance() instanceof CodeString){
                 String value = scanner.nextLine();
-                result.assign(value);
+                result.assign(CodeClass.initializePrimitive("STRING", value));
                 continue;
             } else if (result.getInstance() instanceof CodeFloat) {
                 Double value = scanner.nextDouble();
-                result.assign(value);
+                result.assign(CodeClass.initializePrimitive("FLOAT", value));
                 continue;
             } else if (result.getInstance() instanceof CodeInteger) {
                 Integer value = scanner.nextInt();
-                result.assign(value);
+                result.assign(CodeClass.initializePrimitive("INT", value));
                 continue;
             }else {
                 throw new TypeError(result,  "SCAN");

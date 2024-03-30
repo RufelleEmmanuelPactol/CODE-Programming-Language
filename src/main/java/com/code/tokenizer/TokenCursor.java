@@ -45,7 +45,7 @@ public class TokenCursor implements Iterable<Token> {
 
     public Token lookAhead() {
         if (currentIndex < tokens.size()) {
-            return tokens.get(currentIndex);
+            return tokens.get(currentIndex + 1);
         }
         return null;
     }

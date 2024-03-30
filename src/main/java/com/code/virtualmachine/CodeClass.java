@@ -1,7 +1,9 @@
 package com.code.virtualmachine;
 
+import com.code.data.CodeNil;
 import com.code.data.CodePrimitive;
 import com.code.errors.runtime.InvalidInitializerArgumentsError;
+import com.code.errors.runtime.TypeError;
 import com.code.parser.engine.SymbolTable;
 
 import java.lang.reflect.Constructor;
@@ -17,8 +19,13 @@ public class CodeClass {
     private static CodeObject nullType;
 
 
-    public static final CodeObject getNull(){
+    public static CodeObject getNull(){
+        nullType = nullType == null ? newNullInstance() : nullType;
         return nullType;
+    }
+
+    protected static CodeObject newNullInstance() {
+        return CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols("NULL").cloneRef(CodeNil.nil);
     }
 
     private String dataTypeName;
@@ -51,13 +58,18 @@ public class CodeClass {
         return new CodeClass(dataTypeName, dataType, true);
     }
 
-    public CodeObject fromInstance(Object instance) {
+    public static CodeObject fromInstance(Object instance) {
         String name = instance.getClass().getSimpleName();
         name = CodeRuntime.getRuntime().runtimeSymbolTable.getCanonicalName(name);
         CodeClass o = (CodeClass)CodeRuntime.getRuntime().runtimeSymbolTable.search(name);
-
         return o.initialize(instance);
     }
+
+    public CodeObject cloneRef (Object obj) {
+        if (!dataType.isInstance(obj)) throw new TypeError(dataType.getSimpleName(), obj.getClass().getSimpleName(), "__internal__clone__");
+        return new CodeObject(obj, this);
+    }
+
 
     public String getDataTypeName() {
         return dataTypeName;

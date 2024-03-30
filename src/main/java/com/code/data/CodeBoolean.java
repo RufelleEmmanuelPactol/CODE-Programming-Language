@@ -67,8 +67,9 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
     @Override
     @SuppressWarnings("rawtypes")
     public CodeBoolean or(CodePrimitive other) {
-        return other.not().not() == this ? TRUE : FALSE;
+        return this.data || other.bool().data ? TRUE : FALSE;
     }
+
 
     @Override
     public CodeBoolean not() {

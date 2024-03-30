@@ -1,6 +1,7 @@
 package com.code.data;
 
 import com.code.errors.compile.PrimitiveInitializationError;
+import com.code.errors.runtime.TypeError;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -69,6 +70,19 @@ public abstract class CodePrimitive<T> {
 
     public CodePrimitive notEqualTo(CodePrimitive other) {
         return this.equalTo(other).not();
+    }
+
+    /**
+     * Replaces the internal data.
+     * @param o
+     */
+    public void replaceInside(Object o) {
+        if (this.data.getClass().isInstance(o)) {
+            this.data = (T)o;
+            this.tokenRepresentation = data.toString();
+        } else {
+            throw new TypeError(this.getClass().getSimpleName(), o.getClass().getSimpleName(), "__internal_replace_inside__");
+        }
     }
 
 }

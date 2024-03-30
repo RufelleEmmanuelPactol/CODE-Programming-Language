@@ -15,6 +15,7 @@ public class RegisterPrimitives {
         registerPrimitive("STRING", CodeString.class);
         registerPrimitive("BOOL", CodeBoolean.class);
         registerPrimitive("NULL", NullType.class);
+        registerPrimitive("CHAR", CodeString.class);
     }
 
     private static void registerPrimitive(String name, Class<?> value) {
