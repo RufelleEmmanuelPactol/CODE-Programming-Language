@@ -77,10 +77,6 @@ public class CodeObject {
             for (CodeObject arg : args) {
                 argList.add(arg.getInstance());
             }
-
-
-
-
             // Find the method with the given name and a matching argument list
             // This example assumes all methods can be uniquely identified by name and number of arguments
             Method method = null;
@@ -93,10 +89,8 @@ public class CodeObject {
             if (method == null) {
                 throw new NoSuchMethodException("Method " + methodName + " not found in " + codeClass.getDataTypeName());
             }
-
             var result =  method.invoke(instance, args);
-            CodeRuntime.getRuntime().runtimeSymbolTable.registerIfNotExists(result);
-            return new CodeObject(result, CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result));
+            return CodeRuntime.getRuntime().runtimeSymbolTable.registerIfNotExists(result);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new FieldDoesNotExistError(methodName, codeClass.getDataTypeName());
         }
@@ -105,7 +99,7 @@ public class CodeObject {
 
 
     public String toString() {
-        return "code.lang.object.Code"+ instance.getClass().getSimpleName() +"[" + instance.toString() + "]";
+        return "code.lang.object."+ instance.getClass().getSimpleName() +"[" + instance.toString() + "]";
     }
 
     public Object getInstance() {

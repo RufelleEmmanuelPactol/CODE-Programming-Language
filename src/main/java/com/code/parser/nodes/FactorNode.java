@@ -12,22 +12,29 @@ public class FactorNode extends BinaryNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         ValueToken inside = (ValueToken) value;
         if (inside.getValue().getInstance() instanceof CodeString cstr) {
-            String rawString = cstr.getData();
+
+            String rawString = cstr.getRawString();
 
             // Initialize newString as rawString for cases where no replacement is needed
             String newString = "";
 
             // Check if the string matches ".*" (double quotes surrounding any characters)
-            if (rawString.startsWith("\"") && rawString.endsWith("\"")) {
-                // Remove the first and last characters (the double quotes)
+            if ((rawString.startsWith("\"") && rawString.endsWith("\"")) || (rawString.startsWith("'") && rawString.endsWith("'"))) {
+                // Remove the first and last characters (the quotes)
                 newString = rawString.substring(1, rawString.length() - 1);
                 // Replace escaped double slashes with a single slash
                 newString = newString.replace("\\\\", "\\");
+                // Replace escaped single quotes with a single quote
+                newString = newString.replace("\\'", "'");
+                // Replace escaped double quotes with a single quote
+                newString = newString.replace("\\\"", "\"");
                 cstr.replaceInside(newString);
                 cstr.parseExpressionInside();
             }
+
             // Else, if the string matches [.*] (square brackets surrounding any characters)
             else if (rawString.startsWith("[") && rawString.endsWith("]")) {
                 // Remove the first and last characters (the square brackets), leaving the .* behind

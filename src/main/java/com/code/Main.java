@@ -16,10 +16,14 @@ import com.code.virtualmachine.SimpleTimer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main {
 
     public static String[] args;
+    public static Boolean DEBUG_MODE = false;
+    public static ArrayList<String> rawCode;
+    public static String currentLine;
     public static void main(String[] args) throws Exception {
 
         SimpleTimer.startTime();
@@ -27,7 +31,7 @@ public class Main {
         Main.args = args; // set the args to the args passed in the main method
         Thread.setDefaultUncaughtExceptionHandler(new StandardErrorHandler());
         RegisterPrimitives.registerPrimitives();
-
+        rawCode = new ArrayList<>();
         // This is the main method that is used to run the program.
         // This method reads the <file>.code file, and prepares for execution.
         // The CodeRuntime.getRuntime().runUsingMainThread() method is used to run the
@@ -43,7 +47,9 @@ public class Main {
         if (args.length == 0) {
             args = new String[1];
             args[0] = "main.code";
+            DEBUG_MODE = true;
         }
+
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(args[0]));
@@ -51,6 +57,8 @@ public class Main {
             boolean once = false;
             TokenFactory factory = new TokenFactory();
             while ((line = reader.readLine()) != null)  {
+                currentLine = line;
+                rawCode.add(line);
                 once = true;
                 LeximCursor cursor = new LeximCursor(line);
                 TokenCursor result = factory.tokenize(cursor);
@@ -68,6 +76,6 @@ public class Main {
             throw new FileNotFoundError(e.getMessage() + "\n\t\tCurrent Directory: " + curDir);
         }
 
-        System.out.println("\n[CODEVirtualMachine Runtime Environment]: CODE successfully executed in " + SimpleTimer.endTime() + ".");
+        System.out.println("\n>>> CODE successfully executed in " + SimpleTimer.endTime() + ".\n>>> Process finished with exit code 0.");
     }
 }

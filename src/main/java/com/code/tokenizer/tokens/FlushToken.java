@@ -1,8 +1,10 @@
 package com.code.tokenizer.tokens;
 
-public class FlushToken extends MultiTypeOperator{
+import com.code.data.CodeString;
+
+public class FlushToken extends ValueToken{
     public FlushToken(String representation) {
-        super("$");
+        super(new CodeString("\n"));
 
     }
 }

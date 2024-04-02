@@ -1,9 +1,6 @@
 package com.code.tokenizer;
 
-import com.code.data.CodeBoolean;
-import com.code.data.CodeFloat;
-import com.code.data.CodeInteger;
-import com.code.data.CodeString;
+import com.code.data.*;
 import com.code.tokenizer.tokens.*;
 
 import java.lang.reflect.Constructor;
@@ -32,6 +29,7 @@ public class TokenFactory {
         addBinaryOperator("<=");
         addBinaryOperator("==");
         addBinaryOperator("+=");
+        addBinaryOperator("<>");
         addBinaryOperator("%");
         addBinaryOperator("AND");
         addBinaryOperator("OR");
@@ -53,13 +51,17 @@ public class TokenFactory {
         factoryMaster.put("DISPLAY", IntrinsicDisplay.class);
         factoryMaster.put("SCAN", IntrinsicScan.class);
         factoryMaster.put(";", SemicolonToken.class);
-        factoryMaster.put(".", BinaryOperator.class);
+        factoryMaster.put(".", DotOperator.class);
         factoryMaster.put("=", AssignmentToken.class);
         factoryMaster.put("(", LeftParen.class);
         factoryMaster.put(")", RightParen.class);
         factoryMaster.put("WHILE", WhileToken.class);
         factoryMaster.put("BEGIN", BeginStatement.class);
         factoryMaster.put("END", EndStatement.class);
+        factoryMaster.put("ELSE", ElseToken.class);
+        factoryMaster.put("CONTINUE", ContinueToken.class);
+        factoryMaster.put("BREAK", BreakToken.class);
+        factoryMaster.put("FOR", ForToken.class);
         factoryMaster.put(",", Separator.class);
         factoryMaster.put(":", Colon.class);
         factoryMaster.put("{", LeftBrace.class);
@@ -91,6 +93,8 @@ public class TokenFactory {
         // Handle string literals
         else if (str.matches("\".*\"")) {
             return new ValueToken(new CodeString(str));
+        } else if (str.matches("'.*'")) {
+            return new ValueToken(new CodeChar(str));
         }
         // Handle boolean literals
         else if (str.matches("TRUE|FALSE")) {
@@ -195,7 +199,7 @@ public class TokenFactory {
                     // `STRING y = "Hello, World!"`
                     // `BOOL z = TRUE`
                     // `BEGIN FUNCTION MAIN`, here `MAIN` is a non-terminal.
-                    tokens.add(new NonTerminals(lexim));
+                    tokens.add(new Variable(lexim));
             }
             return new TokenCursor(tokens);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {

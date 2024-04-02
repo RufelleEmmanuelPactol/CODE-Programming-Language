@@ -1,5 +1,6 @@
 package com.code.parser.nodes;
 
+import com.code.data.CodeBoolean;
 import com.code.data.CodePrimitive;
 import com.code.data.CodeString;
 import com.code.errors.compile.CompileBugError;
@@ -28,6 +29,7 @@ public class BinaryNode extends ASTNode {
 
 
     public CodeObject execute() {
+        sync();
 
         if (value.getTokenAsString().equals("$")) {
             // Concat with newline operator, has optional left and right operands
@@ -87,12 +89,20 @@ public class BinaryNode extends ASTNode {
                 CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
                 return clazz.fromInstance(result.getData());
             }
-            case "+", "&": {
+            case "+": {
                 CodeObject obj = left.execute();
                 CodeObject obj2 = right.execute();
                 CodePrimitive primitive1 = (CodePrimitive) obj.getInstance();
                 CodePrimitive primitive2 = (CodePrimitive) obj2.getInstance();
                 CodePrimitive result = primitive1.add(primitive2);
+                CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
+                return clazz.fromInstance(result.getData());
+            } case "&": {
+                CodeObject obj = left.execute();
+                CodeObject obj2 = right.execute();
+                String inst = (obj.getInstance()).toString();
+                CodeString r = new CodeString(inst);
+                CodePrimitive result = r.add((CodePrimitive) obj2.getInstance());
                 CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
                 return clazz.fromInstance(result.getData());
             }
@@ -188,11 +198,19 @@ public class BinaryNode extends ASTNode {
                 CodeObject obj = left.execute();
                 Token obj2 = right.getValue();
                 System.out.println(obj.invokeMethod(obj2.getTokenAsString()));
+            } case "<>" : {
+                CodeObject obj = left.execute();
+                CodeObject obj2 = right.execute();
+                CodePrimitive primitive1 = (CodePrimitive) obj.getInstance();
+                CodePrimitive primitive2 = (CodePrimitive) obj2.getInstance();
+                CodeBoolean result = primitive1.equalTo(primitive2).not();
+                CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
+                return clazz.fromInstance(result.getData());
             }
 
 
             default:
-                throw new CompileBugError("Cannot find operator for term node, " + value.getTokenAsString() + ".");
+                throw new CompileBugError("Cannot find operator for binary node, " + value.getTokenAsString() + ".");
         }
 
     }

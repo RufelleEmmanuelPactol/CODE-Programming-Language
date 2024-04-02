@@ -7,6 +7,7 @@ public class BlockEndNode extends ASTNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         return CodeClass.getNull();
     }
 }

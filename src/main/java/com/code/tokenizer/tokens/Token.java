@@ -1,10 +1,14 @@
 package com.code.tokenizer.tokens;
 
+import com.code.virtualmachine.CodeRuntime;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 public abstract class Token {
+
+    public final int LINE;
 
 
 
@@ -13,6 +17,7 @@ public abstract class Token {
 
     public Token(String representation) {
         this.tokenAsString = representation;
+        LINE = CodeRuntime.getRuntime().GLOBAL_THREAD.getCurrentLineNumber();
     }
 
     public String getTokenAsString() {

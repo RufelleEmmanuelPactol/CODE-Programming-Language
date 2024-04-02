@@ -1,5 +1,6 @@
 package com.code.parser.nodes;
 
+import com.code.data.CodeString;
 import com.code.errors.runtime.TypeError;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeClass;
@@ -29,6 +30,7 @@ public class VariableDeclarationNode extends ASTNode {
     }
 
     public String toString(){
+
         StringBuilder sb = new StringBuilder();
         sb.append(type.getTokenAsString());
         sb.append(" ");
@@ -48,10 +50,22 @@ public class VariableDeclarationNode extends ASTNode {
 
     @Override
     public CodeObject execute() {
+        sync();
+        String dataType = type.getTokenAsString();
         for (VarDeclaration declaration : declarations) {
-                if (declaration.initializer != null) {
+            if (declaration.initializer != null) {
                 CodeObject value = declaration.initializer.execute();
-                typeChecking(value);
+                if (!type.getTokenAsString().equals("OBJECT")) {
+
+                    // THIS is to handle the case where a string is assigned to a boolean,
+                    // but it is using the valid str-to-bool initialization
+                    if (dataType.equals("BOOL") && value.getInstance() instanceof CodeString str) {
+                        if (str.equals("TRUE") || str.equals("FALSE")) {
+                            value = CodeClass.initializePrimitive("BOOL", str.equals("TRUE"));
+                        }
+                    }
+                    typeChecking(value);
+                }
                 CodeRuntime.getRuntime().runtimeSymbolTable.add(declaration.name.getTokenAsString(), value);
             } else {
                 CodeClass dataRep =CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(type.getTokenAsString());
@@ -62,6 +76,11 @@ public class VariableDeclarationNode extends ASTNode {
 
     private void typeChecking(CodeObject obj){
         CodeClass clazz = (CodeClass)CodeRuntime.getRuntime().runtimeSymbolTable.search(type.getTokenAsString());
+        if (clazz.getDataTypeName().equals("CHAR") && obj.getInstance() instanceof CodeString str){
+            if (str.length() != 1){
+                throw new TypeError("CHAR", "STRING", "assignment[Characters > 1]");
+            } return;
+        }
         if (!clazz.getDataType().isInstance(obj.getInstance())){
             throw new TypeError(clazz.getDataTypeName(), obj.getCodeClass().getDataTypeName(), "assignment");
         }

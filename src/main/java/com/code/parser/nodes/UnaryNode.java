@@ -24,6 +24,7 @@ public class UnaryNode extends ASTNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         if (value.equals("+")) {
            Object instance = child.execute().getInstance();
            if (instance instanceof Integer) {

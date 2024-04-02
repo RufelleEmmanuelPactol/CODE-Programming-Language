@@ -28,5 +28,8 @@ public class TypeError extends VMRuntimeError {
     }
 
 
-
+    @Override
+    public String hashcode() {
+        return "308";
+    }
 }

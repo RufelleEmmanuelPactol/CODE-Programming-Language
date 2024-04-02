@@ -5,6 +5,8 @@ import com.code.parser.engine.SymbolTable;
 import com.code.parser.nodes.ASTNode;
 import com.code.parser.nodes.CodeBlockNode;
 
+import java.util.Stack;
+
 /**
  * The Runtime class is the class that manages the runtime of the virtual machine.
  * It contains the global thread and the lock that is used to synchronize the threads.
@@ -13,7 +15,71 @@ import com.code.parser.nodes.CodeBlockNode;
  */
 public class CodeRuntime {
 
+    private boolean RETURNING_FUNCTION = false;
+
+    public void returnInterrupt() {
+        RETURNING_FUNCTION = true;
+    }
+
+    public boolean retrieveReturnInterrupt() {
+        boolean value = RETURNING_FUNCTION;
+        RETURNING_FUNCTION = false;
+        return value;
+    }
+
+    // CONTINUE interrupt
+    private boolean CONTINUE_INTERRUPT = false;
+
+    public void continueInterrupt() {
+        CONTINUE_INTERRUPT = true;
+    }
+
+    public boolean retrieveContinueInterrupt() {
+        boolean value = CONTINUE_INTERRUPT;
+        CONTINUE_INTERRUPT = false;
+        return value;
+    }
+
+    private boolean BREAK_INTERRUPT = false;
+
+    public void breakInterrupt() {
+        BREAK_INTERRUPT = true;
+    }
+
+    public boolean retrieveBreakInterrupt() {
+        boolean value = BREAK_INTERRUPT;
+        BREAK_INTERRUPT = false;
+        return value;
+    }
+
+    private boolean INSIDE_LOOP = false;
+
+    public void loopInterrupt() {
+        INSIDE_LOOP = true;
+    }
+
+    public boolean retrieveLoopInterrupt() {
+        boolean value = INSIDE_LOOP;
+        INSIDE_LOOP = false;
+        return value;
+    }
+
+
+
     public SymbolTable runtimeSymbolTable;
+
+    private Stack<SymbolTable> symbolTableStack = new Stack<>();
+
+    public void siblingSymbolTablePush() {
+        symbolTableStack.push(runtimeSymbolTable);
+        runtimeSymbolTable = new SymbolTable(runtimeSymbolTable.getParent());
+    }
+
+    public void siblingSymbolTablePop() {
+        runtimeSymbolTable = symbolTableStack.pop();
+    }
+
+
     public void popSymbolTable() {
         runtimeSymbolTable = runtimeSymbolTable.getParent();
     }

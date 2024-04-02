@@ -13,7 +13,9 @@ public class ReturnNode extends ASTNode{
     }
     @Override
     public CodeObject execute() {
+        sync();
         CodeRuntime.getRuntime().runtimeSymbolTable.setReturnValue(returnedExpression.execute());
+        CodeRuntime.getRuntime().returnInterrupt();
         return CodeClass.getNull();
     }
 }

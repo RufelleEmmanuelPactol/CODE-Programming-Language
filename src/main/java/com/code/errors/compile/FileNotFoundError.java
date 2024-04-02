@@ -6,4 +6,9 @@ public class FileNotFoundError extends CodeError {
     public FileNotFoundError(String message) {
         super(message);
     }
+
+    @Override
+    public String hashcode() {
+        return "200";
+    }
 }

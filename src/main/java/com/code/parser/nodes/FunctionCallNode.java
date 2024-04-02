@@ -18,6 +18,7 @@ public class FunctionCallNode extends ASTNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         var functionName = value;
         CodeBlockNode function = (CodeBlockNode) CodeRuntime.getRuntime().runtimeSymbolTable.searchAssert(functionName.getTokenAsString());
         List<ASTNode> args = function.getArgs();
@@ -30,9 +31,12 @@ public class FunctionCallNode extends ASTNode{
             CodeRuntime.getRuntime().runtimeSymbolTable.add(((ParameterNode) args.get(i)).getParamName().getTokenAsString(), obj);
         }
         for (ASTNode statement : function.getStatements()) {
-            statement.execute();
+            var x = statement.execute();
+            if (CodeRuntime.getRuntime().retrieveReturnInterrupt()) {
+                break;
+            }
+
         }
-        // NO RETURN KEYWORD YET
 
         CodeObject returnedV = CodeRuntime.getRuntime().runtimeSymbolTable.getReturnedValue();
         CodeRuntime.getRuntime().popSymbolTable();

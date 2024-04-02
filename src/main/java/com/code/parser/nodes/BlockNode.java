@@ -6,6 +6,7 @@ import com.code.virtualmachine.CodeObject;
 public class BlockNode extends ASTNode {
     @Override
     public CodeObject execute() {
+        sync();
         return CodeClass.getNull();
     }
 }

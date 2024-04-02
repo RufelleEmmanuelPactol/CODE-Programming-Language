@@ -6,4 +6,9 @@ public class InvalidArguments extends CodeError {
     public InvalidArguments(String functionName, int expected, int actual) {
         super("[Invalid Argument Count]: Invalid number of arguments for function " + functionName + ". Expected " + expected + " but got " + actual + ".");
     }
+
+    @Override
+    public String hashcode() {
+        return "304";
+    }
 }

@@ -1,7 +1,9 @@
 package com.code.parser.engine;
 
+import com.code.Main;
 import com.code.data.CodeString;
 import com.code.errors.compile.ParseError;
+import com.code.frames.StackFrame;
 import com.code.parser.nodes.*;
 import com.code.tokenizer.TokenCursor;
 import com.code.tokenizer.tokens.*;
@@ -51,7 +53,7 @@ public class RecursiveDescentParser {
              if (currentCursor.current() instanceof ImportNativeToken inT) {
                 eat(ImportNativeToken.class);
                 var node = new NativeNode(this.currentCursor.current());
-                eat(NonTerminals.class);
+                eat(Variable.class);
                 node.execute();
                 continue;
             }
@@ -76,43 +78,170 @@ public class RecursiveDescentParser {
     public ASTNode parseStatement() {
         ASTNode expr = null;
         Token current = currentCursor.current();
-        if (current instanceof DataType) {
-            expr = parseDeclaration();
-        } else if (current instanceof IntrinsicDisplay) {
-            eat(IntrinsicDisplay.class);
-            eat(Colon.class);
-            expr = new DisplayNode(current, parseExpression());
-        }  else if (current instanceof IntrinsicScan) {
-            eat(IntrinsicScan.class);
-            eat(Colon.class);
-            expr = new ScanNode(current, parseVariadic());
-        } else if (current instanceof ThreadedToken) {
-            eat(ThreadedToken.class);
-            expr = parseFunctionCall();
-            expr = new ThreadedFunctionCallNode((FunctionCallNode) expr);
-        } else if (current instanceof ReturnToken) {
-            eat(ReturnToken.class);
-            ASTNode retExpr = parseExpression();
-            expr = new ReturnNode(retExpr);
-        }
-        else if (current instanceof NonTerminals) {
-            if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof Colon) {
-                expr = parseFunctionCall();
-            } else if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof AssignmentToken) {
-                expr = parseAssignment();
+        switch (current) {
+            case DataType dataType -> expr = parseDeclaration();
+            case ForToken forToken -> expr = parseFor();
+            case IntrinsicDisplay intrinsicDisplay -> {
+                eat(IntrinsicDisplay.class);
+                eat(Colon.class);
+                expr = new DisplayNode(current, parseExpression());
+                eat(NewLine.class);
             }
-            else {
-                expr = parseExpression();
+            case IntrinsicScan intrinsicScan -> {
+                eat(IntrinsicScan.class);
+                eat(Colon.class);
+                expr = new ScanNode(current, parseVariadic());
+                eat(NewLine.class);
             }
-        }
-        else {
-            expr = parseExpression();
+            case ReturnToken returnToken -> {
+                eat(ReturnToken.class);
+                ASTNode retExpr = parseExpression();
+                expr = new ReturnNode(retExpr);
+                eat(NewLine.class);
+            }
+            case Variable variable -> {
+                if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof AssignmentToken) {
+                    expr = parseAssignment();
+                } else {
+                    expr = parseExpression();
+                }
+            }
+            case IfBlock ifBlock -> expr = parseIfBlock();
+            case BreakToken breakToken -> {
+                eat(BreakToken.class);
+                expr = new BreakNode();
+                eat(NewLine.class);
+            }
+            case ContinueToken continueToken -> {
+                eat(ContinueToken.class);
+                expr = new ContinueNode();
+                eat(NewLine.class);
+            }
+            case WhileToken whileToken -> expr = parseWhile();
+            case null, default -> expr = parseExpression();
         }
         if (expr instanceof BlockEndNode){
             return expr;
         }
-        eat(NewLine.class);
         return expr;
+    }
+
+
+
+
+    protected ASTNode parseWhile(){
+        eat(WhileToken.class);
+        eat(LeftParen.class);
+        ASTNode condition = parseExpression();
+        eat(RightParen.class);
+        eat(NewLine.class);
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        eat(BeginStatement.class);
+        eat(WhileToken.class);
+        eat(NewLine.class);
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        ArrayList<ASTNode> statements = new ArrayList<>();
+        while (true) {
+            ASTNode node = parseStatement();
+            if (node instanceof BlockEndNode) {
+                eat(EndStatement.class);
+                eat(WhileToken.class);
+                eat(NewLine.class);
+                break;
+            } else if (node == null) {
+                eat(NewLine.class);
+            }else {
+                statements.add(node);
+            }
+        }
+        return new WhileNode(condition, statements);
+    }
+    protected ASTNode parseIfBlock() {
+        eat(IfBlock.class);
+        eat(LeftParen.class);
+        ASTNode condition = parseExpression();
+        eat(RightParen.class);
+        eat(NewLine.class);
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        ArrayList<IfNode> innerIfs = new ArrayList<>();
+        innerIfs.add(parseInnerIfBlock(condition));
+
+        ArrayList<ASTNode> elseStatements = new ArrayList<>();
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        while (currentCursor.current() instanceof ElseToken) {
+            eat(ElseToken.class);
+            if (!(currentCursor.current() instanceof IfBlock)) {
+                // ELSE PARSING
+                eat(NewLine.class);
+                while (currentCursor.current() instanceof NewLine) {
+                    currentCursor.next();
+                }
+                eat(BeginStatement.class);
+                eat(IfBlock.class);
+                eat(NewLine.class);
+                while (currentCursor.current() instanceof NewLine) {
+                    currentCursor.next();
+                }
+                while (true) {
+                    ASTNode node = parseStatement();
+                    eat(NewLine.class);
+                    if (node instanceof BlockEndNode) {
+                        eat(EndStatement.class);
+                        eat(IfBlock.class);
+                        break;
+                    } else {
+                        elseStatements.add(node);
+                    }
+                } break;
+            }
+            eat(IfBlock.class);
+            eat(LeftParen.class);
+            condition = parseExpression();
+            eat(RightParen.class);
+            eat(NewLine.class);
+            while (currentCursor.current() instanceof NewLine) {
+                currentCursor.next();
+            }
+            innerIfs.add(parseInnerIfBlock(condition));
+            if (currentCursor.current() instanceof NewLine) {
+                currentCursor.next();
+            }
+          //  currentCursor.emergencyInsert(new NewLine("\n"));
+        }
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        return new IfBlockNode(innerIfs, elseStatements);
+    }
+
+    protected IfNode parseInnerIfBlock(ASTNode expression){
+        eat(BeginStatement.class);
+        eat(IfBlock.class);
+        eat(NewLine.class);
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        ArrayList<ASTNode> statements = new ArrayList<>();
+        while (true) {
+            ASTNode node = parseStatement();
+            if (node instanceof BlockEndNode) {
+                eat(EndStatement.class);
+                eat(IfBlock.class);
+                eat(NewLine.class);
+                break;
+            } else {
+                statements.add(node);
+            }
+        }
+        return new IfNode(expression, statements);
     }
 
     /**
@@ -125,9 +254,33 @@ public class RecursiveDescentParser {
     protected void eat(Class<? extends Token> tokenType) {
         Token token = currentCursor.current();
         if (!tokenType.isInstance(token)) {
-            throw new ParseError("Expected " + tokenType.getSimpleName() + " token but got " + token.getClass().getSimpleName() + ".");
-        } currentCursor.next();
+            // Assuming the current line is correctly obtained from some storage of code lines
+            int currentLineNumber = CodeRuntime.getRuntime().GLOBAL_THREAD.getCurrentLineNumber();
+            String currentLine = "";
+            if (currentLineNumber > Main.rawCode.size()) {
+                throw new ParseError("Reached the end of the code unexpectedly. Introspected token: " + token.getTokenAsString() + "\n\t\t\tToken mismatch: expected " + tokenType.getSimpleName() + " but got " + token.getClass().getSimpleName() + ".");
+            } else {
+                currentLine = Main.rawCode.get(currentLineNumber - 1);
+            }
+            String errorTokenAsString = token.getTokenAsString();
+
+            // Find the first occurrence of the error token in the current line.
+            int errorTokenStartIndex = currentLine.indexOf(errorTokenAsString);
+
+            // Generate a string of carets (^) equal in length to the error token.
+            String carets = "^".repeat(errorTokenAsString.length());
+
+            // Create an indicator string with spaces leading up to the caret string.
+            String indicator = " ".repeat(Math.max(0, errorTokenStartIndex)) + carets;
+
+            throw new ParseError("On line "+ CodeRuntime.getRuntime().GLOBAL_THREAD.getCurrentLineNumber() +  ", expected " + tokenType.getSimpleName() + " token but got " + token.getClass().getSimpleName() + ".\n" +
+                    "\t\t\tThis was detected in the following line: \n\t\t\t>>>\t" + currentLine +
+                    "\n\t\t\t\t" + indicator);// Shows the indicator under the error token
+        }
+        currentCursor.next();
     }
+
+
 
     /**
      * Parses a declaration statement from the current cursor position. This method handles
@@ -143,7 +296,7 @@ public class RecursiveDescentParser {
         List<VariableDeclarationNode.VarDeclaration> declarations = new ArrayList<>();
         do {
             Token varName = currentCursor.current();
-            eat(NonTerminals.class); // Consuming the variable name token
+            eat(Variable.class); // Consuming the variable name token
 
             ASTNode initializer = null;
             if (currentCursor.current() instanceof AssignmentToken) {
@@ -173,12 +326,25 @@ public class RecursiveDescentParser {
      */
     public ASTNode parseExpression() {
         ASTNode left = parseSimpleExpression();
-        while (currentCursor.current() instanceof BinaryOperator) {
+        while (currentCursor.current() instanceof BinaryOperator || currentCursor.current() instanceof Colon) {
             Token current = currentCursor.current();
-            eat(BinaryOperator.class);
+            if (!(current instanceof Colon)) {
+                eat(BinaryOperator.class);
+            } else{
+                left =  parseFunctionCall(left.getValue());
+                if (!(currentCursor.current() instanceof SemicolonToken)) {
+                    return left;
+                }
+                eat(SemicolonToken.class);
+                return left;
+            } if (current instanceof DotOperator) {
+                return parseMethodCall(left);
+            }
             left = new BinaryNode(left, current , parseSimpleExpression());
         } return left;
     }
+
+
 
     /**
      * Parses a simple expression from the current cursor position. This method handles the parsing of
@@ -193,20 +359,6 @@ public class RecursiveDescentParser {
         while (currentCursor.current() instanceof MultiTypeOperator) {
             Token operator = currentCursor.current();
             eat(MultiTypeOperator.class);
-
-            // handle the flush operator
-            if (operator instanceof FlushToken) {
-                if (currentCursor.hasNext() ) {
-                    // here a newline can also be the last line
-                    ASTNode expr = parseExpression();
-                    left = new BinaryNode(left, operator,expr);
-                    continue;
-                } else {
-                    // append an empty String token to the right
-                    left = new BinaryNode(left, operator, new FactorNode(null, new ValueToken(new CodeString("")), null));
-                    continue;
-                }
-            }
 
 
             left = new TermNode(left, operator, parseTerm());
@@ -246,21 +398,12 @@ public class RecursiveDescentParser {
             ASTNode result = parseExpression();
             eat(RightParen.class);
             return result;
-        }  else if (current instanceof FlushToken nn) {
-            eat(FlushToken.class);
-            ASTNode right = currentCursor.current() instanceof FlushToken ? null: parseExpression();
-            ASTNode node = new TermNode(null, nn,  right);
-
-            return node;
         }
         else if (current instanceof MultiTypeOperator) {
             eat(MultiTypeOperator.class);
             return new UnaryNode(current, parseFactor());
-        } else if (current instanceof NonTerminals) {
-            if (currentCursor.hasNext() && currentCursor.lookAhead() instanceof Colon) {
-                return parseFunctionCall();
-            }
-            eat(NonTerminals.class);
+        } else if (current instanceof Variable) {
+            eat(Variable.class);
             return new NonTerminalFactorNode(null, current, null);
         }
         else if (current instanceof EndStatement) {
@@ -306,11 +449,9 @@ public class RecursiveDescentParser {
                     currentCursor.next();
                     return function;
                 }
-                case IfBlock ifBlock -> eat(IfBlock.class);
-                case WhileToken whileToken -> eat(WhileToken.class);
                 case null, default -> {
                     assert blockType != null;
-                    throw new RuntimeException("Expected FunctionBlock, CodeBlock, IfBlock, WhileToken, but got " +
+                    throw new RuntimeException("Expected Function Block. Cannot parse top-line statements and expressions. Instead, got  " +
                             blockType.getClass().getSimpleName());
                 }
             }
@@ -335,11 +476,11 @@ public class RecursiveDescentParser {
         if (functionType instanceof FunctionBlock) {
             eat(FunctionBlock.class);
             name = currentCursor.current();
-            eat(NonTerminals.class);
+            eat(Variable.class);
             args = parseVarArgs();
         } else if (functionType instanceof CodeBlock) {
             eat(CodeBlock.class);
-            name = new NonTerminals("CODE");
+            name = new Variable("CODE");
             args = new ArrayList<>(); // CODE is a zero-argument function
 
         } else {
@@ -351,7 +492,9 @@ public class RecursiveDescentParser {
         // Here, we parse the statements.
         while (true) {
             ASTNode stmt = parseStatement();
+
             if (stmt == null) {
+                eat(NewLine.class);
                 continue;
             }
             else if (stmt instanceof BlockEndNode) {
@@ -367,9 +510,9 @@ public class RecursiveDescentParser {
 
     protected ASTNode parseAssignment() {
         Token varName = currentCursor.current();
-        eat(NonTerminals.class); // Consuming the variable name token
+        eat(Variable.class); // Consuming the variable name token
         eat(AssignmentToken.class); // Consuming the assignment '=' token
-        ASTNode expr = parseExpression(); // Parsing the expression to assign
+        ASTNode expr = parseStatement(); // Parsing the expression to assign
         return new AssignmentNode(new NonTerminalFactorNode(null, varName, null), expr);
     }
 
@@ -393,7 +536,7 @@ public class RecursiveDescentParser {
             eat(DataType.class); // Consuming the data type token
 
             Token paramName = currentCursor.current();
-            eat(NonTerminals.class); // Consuming the parameter name token
+            eat(Variable.class); // Consuming the parameter name token
 
             // Create a new ParameterNode and add it to the list
             parameters.add(new ParameterNode(dataType, paramName));
@@ -414,7 +557,7 @@ public class RecursiveDescentParser {
 
         do {
             Token current = currentCursor.current();
-            if (current instanceof NonTerminals) {
+            if (current instanceof Variable) {
                 args.add(new NonTerminalFactorNode(null, current, null));
                 currentCursor.next(); // Move to the next token
 
@@ -448,7 +591,7 @@ public class RecursiveDescentParser {
 
 
             // If the argument is a non-terminal (identifier)
-            if (current instanceof NonTerminals) {
+            if (current instanceof Variable) {
                 args.add(new NonTerminalFactorNode(null, current, null));
                 currentCursor.next(); // Move to the next token
             }
@@ -464,7 +607,7 @@ public class RecursiveDescentParser {
                 }
             }
 
-            if (current instanceof SemicolonToken) {
+            if (currentCursor.current() instanceof SemicolonToken) {
                 break;
             }
 
@@ -487,15 +630,68 @@ public class RecursiveDescentParser {
         return args;
     }
 
-    private ASTNode parseFunctionCall() {
-        Token functionName = currentCursor.current();
-        eat(NonTerminals.class); // Consume the function name token
+    private ASTNode parseMethodCall(ASTNode obj){
+        FactorNode objInstance = (FactorNode) obj;
+        Token methodName = currentCursor.current();
+        eat(Variable.class);
+        if (currentCursor.hasNext() && currentCursor.current() instanceof Colon) {
+            eat(Colon.class);
+            if (currentCursor.hasNext()) {
+                if (currentCursor.lookAhead() instanceof SemicolonToken) {
+                    eat(SemicolonToken.class);
+                    return new MethodCallNode(objInstance, methodName, new ArrayList<>(), false);
+                }
+            }
+            List<ASTNode> parameters = parseFunctionArgs(); // Parse the function arguments
+            if (currentCursor.hasNext() && !( currentCursor.current() instanceof NewLine)) {
+                eat(SemicolonToken.class);
+            } return new MethodCallNode(objInstance, methodName, parameters, false);
+        } return new MethodCallNode(objInstance, methodName, new ArrayList<>(), true);
+    }
+
+    private ASTNode parseFunctionCall(Token functionName) {// Consume the function name token
         eat(Colon.class);
-        List<ASTNode> parameters = parseFunctionArgs(); // Parse the function arguments
-        if (currentCursor.hasNext() && !( currentCursor.current() instanceof NewLine)) {
+        if (currentCursor.hasNext() && currentCursor.current() instanceof SemicolonToken) {
             eat(SemicolonToken.class);
+            return new FunctionCallNode(functionName, new ArrayList<>());
         }
+        List<ASTNode> parameters = parseFunctionArgs(); // Parse the function arguments
         return new FunctionCallNode(functionName, parameters);
+    }
+
+    private ASTNode parseFor(){
+        CodeRuntime.getRuntime().pushSymbolTable();
+        eat(ForToken.class);
+        eat(LeftParen.class);
+        ASTNode init = parseStatement();
+        eat(SemicolonToken.class);
+        ASTNode condition = parseExpression();
+        eat(SemicolonToken.class);
+        ASTNode increment = parseStatement();
+        eat(RightParen.class);
+        eat(NewLine.class);
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        eat(BeginStatement.class);
+        eat(ForToken.class);
+        eat(NewLine.class);
+        while (currentCursor.current() instanceof NewLine) {
+            currentCursor.next();
+        }
+        ArrayList<ASTNode> statements = new ArrayList<>();
+        while (true) {
+            ASTNode node = parseStatement();
+            if (node instanceof BlockEndNode) {
+                eat(EndStatement.class);
+                eat(ForToken.class);
+                break;
+            } else {
+                statements.add(node);
+            }
+        }
+        CodeRuntime.getRuntime().popSymbolTable();
+        return new ForNode(init, condition, increment, statements);
     }
 
 

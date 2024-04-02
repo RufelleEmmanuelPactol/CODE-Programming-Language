@@ -1,5 +1,6 @@
 package com.code.parser.nodes;
 
+import com.code.data.CodeBoolean;
 import com.code.data.CodePrimitive;
 import com.code.data.CodeString;
 import com.code.errors.compile.CompileBugError;
@@ -16,6 +17,7 @@ public class TermNode extends BinaryNode{
 
     @Override
     public CodeObject execute() {
+        sync();
 
         if (value.getTokenAsString().equals("$")) {
             // Concat with newline operator (flush), has optional left and right operands
@@ -65,8 +67,14 @@ public class TermNode extends BinaryNode{
                 CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
                 return clazz.fromInstance(result.getData());
             }
-            case "+", "&": {
+            case "+": {
                 CodePrimitive result = primitive1.add(primitive2);
+                CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
+                return clazz.fromInstance(result.getData());
+            } case "&": {
+                String inst = (obj.getInstance()).toString();
+                CodeString r = new CodeString(inst);
+                CodePrimitive result = r.add((CodePrimitive) obj2.getInstance());
                 CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
                 return clazz.fromInstance(result.getData());
             }
@@ -114,6 +122,10 @@ public class TermNode extends BinaryNode{
                 return clazz.fromInstance(result.getData());
             } case "NOT": {
                 CodePrimitive result = primitive1.not();
+                CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
+                return clazz.fromInstance(result.getData());
+            } case "<>" : {
+                CodeBoolean result = primitive1.equalTo(primitive2).not()   ;
                 CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(result.getData());
                 return clazz.fromInstance(result.getData());
             }

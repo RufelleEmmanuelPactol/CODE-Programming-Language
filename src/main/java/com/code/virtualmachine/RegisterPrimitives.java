@@ -1,9 +1,6 @@
 package com.code.virtualmachine;
 
-import com.code.data.CodeBoolean;
-import com.code.data.CodeFloat;
-import com.code.data.CodeInteger;
-import com.code.data.CodeString;
+import com.code.data.*;
 
 public class RegisterPrimitives {
 
@@ -15,7 +12,7 @@ public class RegisterPrimitives {
         registerPrimitive("STRING", CodeString.class);
         registerPrimitive("BOOL", CodeBoolean.class);
         registerPrimitive("NULL", NullType.class);
-        registerPrimitive("CHAR", CodeString.class);
+        registerPrimitive("CHAR", CodeChar.class);
     }
 
     private static void registerPrimitive(String name, Class<?> value) {

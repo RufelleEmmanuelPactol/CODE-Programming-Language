@@ -24,6 +24,10 @@ public abstract class CodePrimitive<T> {
         return data;
     }
 
+    public String String() {
+        return tokenRepresentation;
+    }
+
 
 
     public CodePrimitive (String tokenRepresentation, T data) {
@@ -64,7 +68,7 @@ public abstract class CodePrimitive<T> {
         } else if (o instanceof String s) {
             return new CodeString(s);
         } else if (o instanceof Boolean b) {
-            return b ? CodeBoolean.TRUE : CodeBoolean.FALSE;
+            return b ? new CodeBoolean(true) : new CodeBoolean(false);
         } throw new PrimitiveInitializationError(o.getClass().getSimpleName());
     }
 

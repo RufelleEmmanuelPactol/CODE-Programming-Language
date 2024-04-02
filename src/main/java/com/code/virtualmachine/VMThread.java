@@ -22,6 +22,10 @@ public class VMThread {
         }
     }
 
+    public void syncLineNumber(int num) {
+        currentLineNumber = num;
+    }
+
     public int getCurrentLineNumber() {
         synchronized (lock) {
             return currentLineNumber;

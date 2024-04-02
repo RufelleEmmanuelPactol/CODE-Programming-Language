@@ -6,4 +6,6 @@ public abstract class CodeError extends RuntimeException {
         super("CODElang Virtual Machine Error: " +
                 message);
     }
+
+    public abstract String hashcode();
 }

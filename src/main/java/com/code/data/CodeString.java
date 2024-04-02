@@ -1,7 +1,9 @@
 package com.code.data;
 
+import com.code.Main;
 import com.code.errors.runtime.InvalidStringInterpolationError;
 import com.code.errors.runtime.TypeError;
+import com.code.errors.runtime.VMRuntimeError;
 import com.code.parser.engine.RecursiveDescentParser;
 import com.code.parser.nodes.ASTNode;
 import com.code.tokenizer.LeximCursor;
@@ -17,7 +19,14 @@ public class CodeString extends CodePrimitive<String>{
         super(data, data);
 
         this.tokenRepresentation = data;
+        rawString = data;
 
+    }
+
+    private final String rawString;
+
+    public String getRawString() {
+        return rawString;
     }
 
     public int length() {
@@ -30,6 +39,7 @@ public class CodeString extends CodePrimitive<String>{
 
     public CodeString(){
         super("", "");
+        rawString = data;
     }
 
     @Override
@@ -44,16 +54,13 @@ public class CodeString extends CodePrimitive<String>{
 
     @Override
     public boolean equals(Object obj) {
-        return false;
+        return data.equals(obj);
     }
 
     @Override
     @SuppressWarnings("rawtypes")
     public CodePrimitive add(CodePrimitive other) {
-            if (other instanceof CodeString) {
-                return new CodeString(this.data + other.data);
-            }
-        throw new TypeError(this, other, "&");
+            return new CodeString(data.toString() + other.String());
     }
 
     @Override
@@ -162,9 +169,14 @@ public class CodeString extends CodePrimitive<String>{
                 // Append the evaluated expression to the result
                 result.append(evaluatedExpression);
             } catch (Exception e) {
+
+                if (Main.DEBUG_MODE) {
+                    e.printStackTrace();
+                }
+
                 // Handle invalid expressions by throwing a custom exception
                 // Assuming `InvalidStringInterpolationError` is a custom exception class you've defined for this purpose
-                throw new InvalidStringInterpolationError("Invalid expression: `" + expression + "`.");
+                throw new InvalidStringInterpolationError("Invalid expression: `" + expression + "`.\n\t\tBecause: " + (e instanceof VMRuntimeError er? er.originalMessage : e.getMessage()));
             }
 
             lastEnd = matcher.end();

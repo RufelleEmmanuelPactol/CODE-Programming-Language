@@ -15,6 +15,7 @@ public class ThreadedFunctionCallNode extends FunctionCallNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         Thread t = new Thread(super::execute);
         t.start();
         return CodeRuntime.getRuntime().runtimeSymbolTable.getReturnedValue();

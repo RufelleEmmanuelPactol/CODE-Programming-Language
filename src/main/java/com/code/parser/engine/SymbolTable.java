@@ -30,6 +30,23 @@ public class SymbolTable {
     }
 
 
+    public void assign(String key, CodeObject value) {
+        key = getCanonicalName(key);
+        Object result = search(key);
+        if (result == null) {
+            throw new VariableNotFoundError(key);
+        }
+        SymbolTable table = this;
+        while (table != null) {
+            if (table.symbol.containsKey(key)) {
+                table.symbol.put(key, value);
+                return;
+            }
+            table = table.parent;
+        }
+    }
+
+
 
     /**
      * Register a class in the symbol table. This method will
@@ -73,12 +90,14 @@ public class SymbolTable {
     /**
      * Register an object in the symbol table if it does not exist.
      */
-    public void registerIfNotExists(Object o) {
+    public CodeObject registerIfNotExists(Object o) {
         String name = o.getClass().getSimpleName();
         String cannon = getCanonicalName(name);
-        if (search(cannon) == null){
-            new CodeClass(name, o.getClass());
-        }
+        var searched = search(cannon);
+        if (searched == null){
+            CodeClass c = new CodeClass(name, o.getClass());
+            return c.cloneRef(o);
+        } return ((CodeClass)searched).cloneRef(o);
     }
 
 
@@ -113,6 +132,7 @@ public class SymbolTable {
      * search in that it throws an error if the key is not found.
      */
     public Object searchAssert(String key) {
+
         String name = canonicalNames.get(key);
         key = name != null ? name : key;
         Object result = search(key);
@@ -139,7 +159,6 @@ public class SymbolTable {
         canonicalNames.put("null", "NULL");
         canonicalNames.put("Double", "FLOAT");
         canonicalNames.put("CodeNil", "NULL");
-        canonicalNames.put("CHAR", "STRING");
     }
 
     private static HashMap<String, Class<?>> canonicalClasses;
@@ -152,6 +171,7 @@ public class SymbolTable {
             canonicalClasses.put("STRING", CodeString.class);
             canonicalClasses.put("BOOL", CodeBoolean.class);
             canonicalClasses.put("NULL", CodeNil.class);
+            canonicalClasses.put("CHAR", CodeChar.class);
         }
 
     }

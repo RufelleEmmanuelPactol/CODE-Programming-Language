@@ -2,6 +2,7 @@ package com.code.tokenizer;
 
 import com.code.errors.compile.ParseError;
 import com.code.tokenizer.tokens.NewLine;
+import com.code.tokenizer.tokens.SemicolonToken;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeRuntime;
 
@@ -32,6 +33,14 @@ public class TokenCursor implements Iterable<Token> {
         return null;
     }
 
+
+    public Token emergencyInsert(Token token) {
+        if (token instanceof NewLine) {
+            CodeRuntime.getRuntime().GLOBAL_THREAD.syncLineNumber(CodeRuntime.getRuntime().GLOBAL_THREAD.getCurrentLineNumber() - 1);
+        }
+        tokens.add(currentIndex, token);
+        return token;
+    }
     public Token current() {
         if (currentIndex < tokens.size()) {
             return tokens.get(currentIndex);
@@ -51,7 +60,7 @@ public class TokenCursor implements Iterable<Token> {
     }
 
     public boolean hasNext() {
-        return currentIndex < tokens.size();
+        return currentIndex < tokens.size() - 1;
     }
 
     public void reset() {

@@ -13,6 +13,7 @@ public class DisplayNode extends UnaryNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         CodeObject childValue = child.execute();
         System.out.print(childValue.getInstance());
         return childValue;

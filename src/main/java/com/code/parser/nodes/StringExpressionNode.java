@@ -13,6 +13,7 @@ public class StringExpressionNode extends UnaryNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         CodePrimitive impl = CodePrimitive.fromNativeImplementation(child.execute().getInstance().toString());
         return CodeClass.initializePrimitive("STRING", impl);
     }

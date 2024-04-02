@@ -1,6 +1,12 @@
 package com.code.data;
 
+import com.code.virtualmachine.CodeClass;
+import com.code.virtualmachine.CodeObject;
+
 public class CodeBoolean extends CodePrimitive<Boolean>{
+
+    public static final CodeObject TRUE_OBJECT = CodeClass.initializePrimitive("BOOL", true);
+    public static final CodeObject FALSE_OBJECT = CodeClass.initializePrimitive("BOOL", false);
 
     private CodeBoolean(String tokenRepresentation, Boolean data) {
         super(tokenRepresentation, data);
@@ -29,7 +35,7 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
 
     @Override
     public boolean equals(Object obj) {
-        return false;
+        return (obj instanceof CodeBoolean s) && equalTo(s) == TRUE;
     }
 
     @Override
@@ -61,7 +67,7 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
     @Override
     @SuppressWarnings("rawtypes")
     public CodeBoolean and(CodePrimitive other) {
-        return this == other.bool() ? this : FALSE;
+        return this.data && other.bool().data? this : FALSE;
     }
 
     @Override
@@ -103,6 +109,6 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
 
     @Override
     public CodeBoolean equalTo(CodePrimitive other) {
-        return null;
+        return other.bool().data == data ? TRUE : FALSE;
     }
 }

@@ -19,14 +19,14 @@ public class LeximCursor implements Iterable<String> {
         ArrayList<String> tokens = new ArrayList<>();
         // Updated pattern string to handle escaped quotes within quoted strings and ensure operators are matched correctly
         String patternString =
-                "(\\\"(?:\\\\\\\"|[^\"])*?\\\")" +                  // Matches string literals
-                        "|(>=|<=|<|==|\\+\\+|--|\\+|-|/|\\*|>|%)" +          // Matches operators
-                        "|([()=;.,:{}#$])" +                                // Matches single character symbols, excluding []
-                        "|(\\d+\\.\\d+|\\d+)" +                              // Matches floating-point numbers and integers
-                        "|([\\w&|]+)" +                                     // Matches words (identifiers and keywords)
+                "(\\\"(?:\\\\\\\"|[^\"])*?\\\")" +                  // Matches double-quoted string literals
+                        "|('(?:\\\\'|[^'])*?')" +                            // Matches single-quoted string literals
+                        "|(>=|<>|<=|<|==|\\+\\+|--|\\+|-|/|\\*|>|%)" +        // Matches operators
+                        "|([()=;.,:{}#$])" +                                  // Matches single character symbols, excluding []
+                        "|(\\d+\\.\\d+|\\d+)" +                                // Matches floating-point numbers and integers
+                        "|([\\w&|]+)" +                                       // Matches words (identifiers and keywords)
                         "|(\\[.\\])+" +
-                        "|(@NATIVE)";                                       // Matches [any character only one]
-
+                        "|(@NATIVE)";                                         // Matches [any character only one]
 
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(codeLine);

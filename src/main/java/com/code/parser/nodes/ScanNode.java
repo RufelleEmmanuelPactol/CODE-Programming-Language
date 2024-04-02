@@ -22,6 +22,7 @@ public class ScanNode extends ASTNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         List<NonTerminalFactorNode> args = this.args.getArgs();
         for (var arg: args) {
             CodeObject result = arg.execute();

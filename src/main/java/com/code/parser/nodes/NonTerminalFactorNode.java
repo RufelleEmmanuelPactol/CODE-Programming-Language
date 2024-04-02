@@ -11,6 +11,7 @@ public class NonTerminalFactorNode extends FactorNode{
 
     @Override
     public CodeObject execute() {
+        sync();
         return  (CodeObject) CodeRuntime.getRuntime().runtimeSymbolTable.searchAssert(value.getTokenAsString());
     }
 }

@@ -1,9 +1,7 @@
 package com.code.parser.nodes;
 
-import com.code.tokenizer.tokens.NonTerminals;
-import com.code.tokenizer.tokens.Token;
+import com.code.virtualmachine.CodeClass;
 import com.code.virtualmachine.CodeObject;
-import com.code.virtualmachine.CodeRuntime;
 
 import java.util.List;
 
@@ -21,7 +19,8 @@ public class VariadicNode extends ASTNode{
 
     @Override
     public CodeObject execute() {
-        return null;
+        sync();
+        return CodeClass.getNull();
     }
 
 

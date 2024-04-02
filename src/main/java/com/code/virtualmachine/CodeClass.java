@@ -1,7 +1,6 @@
 package com.code.virtualmachine;
 
-import com.code.data.CodeNil;
-import com.code.data.CodePrimitive;
+import com.code.data.*;
 import com.code.errors.runtime.InvalidInitializerArgumentsError;
 import com.code.errors.runtime.TypeError;
 import com.code.parser.engine.SymbolTable;
@@ -66,9 +65,27 @@ public class CodeClass {
     }
 
     public CodeObject cloneRef (Object obj) {
-        if (!dataType.isInstance(obj)) throw new TypeError(dataType.getSimpleName(), obj.getClass().getSimpleName(), "__internal__clone__");
+        obj = getPrimitiveTypeIfPrimitive(obj);
+        if (!dataType.isInstance(obj)){
+            throw new TypeError(dataType.getSimpleName(), obj.getClass().getSimpleName(), "__internal__clone__");
+        }
         return new CodeObject(obj, this);
     }
+
+    private Object getPrimitiveTypeIfPrimitive(Object obj) {
+        if (obj instanceof Integer i) {
+            return new CodeInteger(i);
+        } else if (obj instanceof String str) {
+            return new CodeString(str);
+        } else if (obj instanceof Double dbl) {
+            return new CodeFloat(dbl);
+        } else if (obj instanceof Boolean bl) {
+            return new CodeBoolean(bl);
+        } return obj;
+    }
+
+
+
 
 
     public String getDataTypeName() {
@@ -96,6 +113,8 @@ public class CodeClass {
             throw new InvalidInitializerArgumentsError(e.getMessage());
         }
     }
+
+
 
     /**
      * Initializes a primitive data type.
