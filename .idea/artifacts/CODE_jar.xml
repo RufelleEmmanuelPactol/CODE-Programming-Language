@@ -3,6 +3,16 @@
     <output-path>$PROJECT_DIR$/out/artifacts/CODE_jar</output-path>
     <root id="archive" name="CODE.jar">
       <element id="module-output" name="CODE" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:mac-aarch64:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:mac-aarch64:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:mac-aarch64:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-media:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-media:mac-aarch64:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-web:18" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-web:mac-aarch64:18" />
     </root>
   </artifact>
 </component>

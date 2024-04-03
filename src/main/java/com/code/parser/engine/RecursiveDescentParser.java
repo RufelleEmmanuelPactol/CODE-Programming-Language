@@ -105,6 +105,9 @@ public class RecursiveDescentParser {
                 } else {
                     expr = parseExpression();
                 }
+            } case ThreadedToken threadedToken -> {
+                eat(ThreadedToken.class);
+                expr = new ThreadedNode(parseStatement());
             }
             case IfBlock ifBlock -> expr = parseIfBlock();
             case BreakToken breakToken -> {
@@ -180,7 +183,6 @@ public class RecursiveDescentParser {
             eat(ElseToken.class);
             if (!(currentCursor.current() instanceof IfBlock)) {
                 // ELSE PARSING
-                eat(NewLine.class);
                 while (currentCursor.current() instanceof NewLine) {
                     currentCursor.next();
                 }
@@ -192,12 +194,18 @@ public class RecursiveDescentParser {
                 }
                 while (true) {
                     ASTNode node = parseStatement();
-                    eat(NewLine.class);
                     if (node instanceof BlockEndNode) {
                         eat(EndStatement.class);
                         eat(IfBlock.class);
                         break;
                     } else {
+                        if (node == null) {
+                            eat(NewLine.class);
+                            continue;
+                        }
+                        if (currentCursor.current() instanceof NewLine) {
+                            currentCursor.next();
+                        }
                         elseStatements.add(node);
                     }
                 } break;
@@ -238,6 +246,10 @@ public class RecursiveDescentParser {
                 eat(NewLine.class);
                 break;
             } else {
+                if (node == null) {
+                    eat(NewLine.class);
+                    continue;
+                }
                 statements.add(node);
             }
         }
@@ -418,10 +430,22 @@ public class RecursiveDescentParser {
         } else if (current instanceof UnaryOperator un) {
             eat(UnaryOperator.class);
             return new UnaryNode(un, parseFactor());
+        } else if (current instanceof NewToken) {
+            eat(NewToken.class);
+            Token s = currentCursor.current();
+            eat(Variable.class);
+            if (currentCursor.hasNext() && currentCursor.current() instanceof Colon) {
+                eat(Colon.class);
+                return new NewNode(s, parseFunctionArgs());
+            } return new NewNode(s, new ArrayList<>());
+
         }
         else
         throw new RuntimeException("[ParseError]: Expected ValueToken or LeftParen but got " + current.getClass().getSimpleName() +".");
     }
+
+
+
 
     /**
      * Parses a block from the current cursor position. This method handles the parsing of blocks in the
@@ -586,10 +610,6 @@ public class RecursiveDescentParser {
         List<ASTNode> args = new ArrayList<>();
         while (true) {
             Token current = currentCursor.current();
-
-
-
-
             // If the argument is a non-terminal (identifier)
             if (current instanceof Variable) {
                 args.add(new NonTerminalFactorNode(null, current, null));
@@ -687,6 +707,10 @@ public class RecursiveDescentParser {
                 eat(ForToken.class);
                 break;
             } else {
+                if (node == null) {
+                    eat(NewLine.class);
+                    continue;
+                }
                 statements.add(node);
             }
         }

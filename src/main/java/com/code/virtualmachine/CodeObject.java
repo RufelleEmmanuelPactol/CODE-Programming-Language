@@ -49,7 +49,7 @@ public class CodeObject {
             CodeClass clazz = CodeRuntime.getRuntime().runtimeSymbolTable.getClassFromSymbols(o);
             return clazz.fromInstance(o);
         } catch (NoSuchFieldException e) {
-            throw new FieldDoesNotExistError(name, codeClass.getDataTypeName());
+            throw new FieldDoesNotExistError(name, codeClass.getDataTypeName(), e.getLocalizedMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public class CodeObject {
         try {
             List<Object> argList = new ArrayList<>();
             for (CodeObject arg : args) {
-                argList.add(arg.getInstance());
+                argList.add(arg.getInstance() instanceof CodePrimitive<?> prim ? prim.getData() : arg.getInstance());
             }
             // Find the method with the given name and a matching argument list
             // This example assumes all methods can be uniquely identified by name and number of arguments
@@ -89,10 +89,11 @@ public class CodeObject {
             if (method == null) {
                 throw new NoSuchMethodException("Method " + methodName + " not found in " + codeClass.getDataTypeName());
             }
-            var result =  method.invoke(instance, args);
+            var result =  method.invoke(instance, argList.toArray());
+            if (result == null) return CodeClass.getNull();
             return CodeRuntime.getRuntime().runtimeSymbolTable.registerIfNotExists(result);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new FieldDoesNotExistError(methodName, codeClass.getDataTypeName());
+            throw new FieldDoesNotExistError(methodName, codeClass.getDataTypeName(), e.getCause().toString());
         }
     }
 

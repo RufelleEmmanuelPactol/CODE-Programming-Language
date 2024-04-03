@@ -18,9 +18,7 @@ public class SimpleTimer {
      * @return The elapsed time in seconds as a String.
      */
     public static String endTime() {
-        if (startTime == 0) {
-            throw new IllegalStateException("Timer has not been started. Call startTime() first.");
-        }
+
 
         long endTime = System.nanoTime();
         double elapsedTimeInSeconds = (endTime - startTime) / 1_000_000_000.0;

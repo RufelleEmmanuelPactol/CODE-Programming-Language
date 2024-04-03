@@ -197,7 +197,7 @@ public class BinaryNode extends ASTNode {
             } case ".": {
                 CodeObject obj = left.execute();
                 Token obj2 = right.getValue();
-                System.out.println(obj.invokeMethod(obj2.getTokenAsString()));
+                obj.invokeMethod(obj2.getTokenAsString());
             } case "<>" : {
                 CodeObject obj = left.execute();
                 CodeObject obj2 = right.execute();

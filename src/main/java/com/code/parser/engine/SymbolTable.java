@@ -8,6 +8,7 @@ import com.code.virtualmachine.CodeClass;
 import com.code.virtualmachine.CodeObject;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SymbolTable {
     protected SymbolTable parent;
@@ -18,19 +19,19 @@ public class SymbolTable {
         returnedValue = o;
     }
 
-    public CodeObject getReturnedValue () {
+    public synchronized CodeObject getReturnedValue () {
         returnedValue = returnedValue == null ? CodeClass.getNull() : returnedValue;
         return returnedValue;
     }
 
 
 
-    public SymbolTable getParent(){
+    public synchronized SymbolTable getParent(){
         return parent;
     }
 
 
-    public void assign(String key, CodeObject value) {
+    public synchronized void assign(String key, CodeObject value) {
         key = getCanonicalName(key);
         Object result = search(key);
         if (result == null) {
@@ -52,7 +53,7 @@ public class SymbolTable {
      * Register a class in the symbol table. This method will
      * throw an error if the class already exists in the symbol table.
      */
-    public void registerClass(String name, CodeClass instance) {
+    public synchronized void registerClass(String name, CodeClass instance) {
         String canonicalName = getCanonicalName(name);
         if (canonicalName != null) {
             getCanonicalClass(canonicalName);
@@ -65,7 +66,7 @@ public class SymbolTable {
     /**
      * Get a class from the symbol table by name.
      */
-    public CodeClass getClassFromSymbols(String name) {
+    public synchronized CodeClass getClassFromSymbols(String name) {
         name = getCanonicalName(name);
         Object searched = search(name);
         if (searched == null) throw new ClassDoesNotExistError(name);
@@ -77,7 +78,7 @@ public class SymbolTable {
      * Get a class from the symbol table by object.
      * This method uses the object's class name to search for the class.
      */
-    public CodeClass getClassFromSymbols(Object o) {
+    public synchronized CodeClass getClassFromSymbols(Object o) {
         String name = o.getClass().getSimpleName();
         String cannon = getCanonicalName(name);
         name = cannon != null ? cannon : name;
@@ -90,7 +91,7 @@ public class SymbolTable {
     /**
      * Register an object in the symbol table if it does not exist.
      */
-    public CodeObject registerIfNotExists(Object o) {
+    public synchronized CodeObject registerIfNotExists(Object o) {
         String name = o.getClass().getSimpleName();
         String cannon = getCanonicalName(name);
         var searched = search(cannon);
@@ -100,12 +101,17 @@ public class SymbolTable {
         } return ((CodeClass)searched).cloneRef(o);
     }
 
+    public synchronized void registerNativeInterface(String name, Class<?> c) {
+        CodeClass cd = new CodeClass(name, c);
+        this.add(name, cd);
+    }
 
 
-    protected HashMap<String, Object> symbol;
+
+    protected ConcurrentHashMap<String, Object> symbol;
 
     public SymbolTable() {
-        symbol = new HashMap<>();
+        symbol = new ConcurrentHashMap<>();
         initCanonicalNames();
     }
 
@@ -117,7 +123,7 @@ public class SymbolTable {
     /**
      * Search for a key in the symbol table.
      */
-    public Object search(String key) {
+    public synchronized Object search(String key) {
         if (symbol.containsKey(key)) {
             return symbol.get(key);
         } else if (parent != null) {
@@ -131,7 +137,7 @@ public class SymbolTable {
      * Search for a key in the symbol table. This differs from
      * search in that it throws an error if the key is not found.
      */
-    public Object searchAssert(String key) {
+    public synchronized Object searchAssert(String key) {
 
         String name = canonicalNames.get(key);
         key = name != null ? name : key;
@@ -143,7 +149,7 @@ public class SymbolTable {
 
     private static HashMap<String, String> canonicalNames = new HashMap<>();
 
-    public String getCanonicalName(String name) {
+    public synchronized String getCanonicalName(String name) {
         if (canonicalNames.containsKey(name)) {
             return canonicalNames.get(name);
         }
@@ -180,7 +186,7 @@ public class SymbolTable {
      * Get a canonical class by name. A canonical class is a class that is defined in the language.
      * It replaces Java's class name with the language's class name.
      */
-    public Class<?> getCanonicalClass(String name){
+    public  synchronized Class<?> getCanonicalClass(String name){
         initCanonicalClass();
         Object result = search(name);
 
@@ -197,7 +203,7 @@ public class SymbolTable {
     /**
      * Add a new object to the symbol table.
      */
-    public void add(String key, Object value) {
+    public  synchronized void add(String key, Object value) {
         if (value instanceof CodeObject) {
             key = getCanonicalName(key);
             Class<?> cannonicalClass = getCanonicalClass(key);
@@ -209,5 +215,14 @@ public class SymbolTable {
             throw new NameShadowError(key);
         }
         symbol.put(key, value);
+    }
+
+    public ConcurrentHashMap<String, Object> unsafeGetSymbolTable() {
+        return symbol;
+    }
+
+    public SymbolTable(ConcurrentHashMap<String, Object> symbol, SymbolTable parent) {
+        this(parent);
+        this.symbol = symbol;
     }
 }

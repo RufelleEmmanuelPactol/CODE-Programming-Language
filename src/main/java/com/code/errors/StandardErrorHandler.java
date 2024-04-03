@@ -11,10 +11,12 @@ import java.util.TimerTask;
 
 public class StandardErrorHandler implements Thread.UncaughtExceptionHandler {
     private static final Scanner scanner = new Scanner(System.in);
+    private static Throwable base = null;
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         try {
+            base = e;
             System.err.println("\nCODE Standard Error Handler, CODE_LANG_VERSION: 0.1.0");
             System.err.println("\n\tBefore fatally crashing, the Code Runtime Virtual Machine was able to retrieve the error message.");
             System.err.println("\tNote that errors can come from the JVM-interops (Exceptions) or from the Code Runtime (Errors).");
@@ -29,12 +31,12 @@ public class StandardErrorHandler implements Thread.UncaughtExceptionHandler {
             }
             maxLength = Math.max(maxLength, 60);
             // Adjust the border length based on the longest line
-            String border = String.format("<%s CODE Virtual Machine Telemetry Module %s>", "=".repeat((10 + maxLength - 12) / 2), "=".repeat((10 + maxLength - 12) / 2));
-            String border2 = String.format("<%s CODE Virtual Machine Diagnostic Analysis %s>", "=".repeat((8 + maxLength - 13) / 2), "=".repeat((8 + maxLength - 13) / 2));
+            String border = String.format("<%s CODE Virtual Machine Telemetry Module %s>", "=".repeat(( maxLength - 12) / 2), "=".repeat((maxLength - 12) / 2));
+            String border2 = String.format("<%s CODE Virtual Machine Diagnostic Analysis %s>", "=".repeat(( maxLength - 13) / 2), "=".repeat((maxLength - 13) / 2));
 
             System.err.println("\n\t\t " + border);
             System.err.println("\n\t\t   The virtual machine has retrieved the following error message:\n");
-            System.err.println("\t\t\t[" + e.getClass().getSimpleName() + "]::" + e.getMessage());
+            System.err.println("\t\t\t[" + e.getClass().getSimpleName() + "]::" + ((e instanceof CodeError c) ? c.getMessage() : e.getCause() == null? e.getMessage():e.getCause().toString()));
             System.err.println("\n\t\t " + border);
 
             if (!(e instanceof ParseError)) {
@@ -55,7 +57,7 @@ public class StandardErrorHandler implements Thread.UncaughtExceptionHandler {
             }
         } catch (Exception ex) {
             System.err.println("CODE Standard Error Handler: Fatal error in the error handler. Please report this to the CODE team.");
-            ex.printStackTrace();
+            e.printStackTrace();
         }
     }
 

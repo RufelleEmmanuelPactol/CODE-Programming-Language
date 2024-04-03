@@ -42,7 +42,7 @@ public class TokenFactory {
         factoryMaster.put("$", FlushToken.class);
         factoryMaster.put("*", TermToken.class);
         factoryMaster.put("/", TermToken.class);
-        factoryMaster.put("&", TermToken.class);
+        factoryMaster.put("&", BinaryOperator.class);
         factoryMaster.put("+", MultiTypeOperator.class);
         factoryMaster.put("-", MultiTypeOperator.class);
         factoryMaster.put("FUNCTION", FunctionBlock.class);
@@ -62,6 +62,7 @@ public class TokenFactory {
         factoryMaster.put("CONTINUE", ContinueToken.class);
         factoryMaster.put("BREAK", BreakToken.class);
         factoryMaster.put("FOR", ForToken.class);
+        factoryMaster.put("create", NewToken.class);
         factoryMaster.put(",", Separator.class);
         factoryMaster.put(":", Colon.class);
         factoryMaster.put("{", LeftBrace.class);

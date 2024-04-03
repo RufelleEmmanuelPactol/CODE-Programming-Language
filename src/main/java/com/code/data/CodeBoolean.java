@@ -15,7 +15,7 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
     public static final CodeBoolean TRUE = new CodeBoolean("TRUE", true);
     public static final CodeBoolean FALSE = new CodeBoolean("FALSE", false);
 
-    public CodeBoolean (Boolean b) {
+    public CodeBoolean (boolean b) {
         super(b ? "TRUE" : "FALSE", b ? true : false);
     }
 

@@ -5,7 +5,9 @@ import com.code.parser.engine.SymbolTable;
 import com.code.parser.nodes.ASTNode;
 import com.code.parser.nodes.CodeBlockNode;
 
+import java.util.HashMap;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The Runtime class is the class that manages the runtime of the virtual machine.
@@ -100,14 +102,39 @@ public class CodeRuntime {
         runtimeSymbolTable = new SymbolTable();
     };
 
+    private CodeRuntime(SymbolTable s) {
+        GLOBAL_THREAD = new VMThread(1, "MAIN_THREAD");
+        runtimeSymbolTable = s;
+    }
+
     private static final CodeRuntime CURRENT_RUNTIME = new CodeRuntime();
+
+    private static HashMap<Long, CodeRuntime> runtimes = new HashMap<>();
+    private static final long currentId = Thread.currentThread().threadId();
 
     /**
      * This method returns the current instance of the runtime engine.
      * @return the current instance of the runtime engine.
      */
     public static CodeRuntime getRuntime() {
-        return CURRENT_RUNTIME;
+        if (currentId == Thread.currentThread().threadId()) {
+            return CURRENT_RUNTIME;
+        } else if (runtimes.containsKey(currentId)) {
+            return runtimes.get(currentId);
+        } else {
+            SymbolTable parent = CURRENT_RUNTIME.runtimeSymbolTable.getParent();
+            ConcurrentHashMap<String, Object> symbol = CURRENT_RUNTIME.runtimeSymbolTable.unsafeGetSymbolTable();
+            for (String key : symbol.keySet()) {
+                Object o = symbol.get(key);
+                if (o instanceof CodeObject) continue;
+                symbol.put(key,  o);
+            }
+            CodeRuntime r = new CodeRuntime(new SymbolTable(symbol, parent));
+            runtimes.put(currentId, r);
+            CodeStandardLibrary.registerStandardNatives();
+            RegisterPrimitives.registerPrimitives();
+            return r;
+        }
     }
 
 

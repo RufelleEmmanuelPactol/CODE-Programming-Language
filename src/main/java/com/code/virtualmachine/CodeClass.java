@@ -100,19 +100,38 @@ public class CodeClass {
     public CodeObject initialize(Object... args) {
         try {
             ArrayList<Class<?>> arguments = new ArrayList<>();
-            for (var arg: args){
-                arguments.add(arg.getClass());
+            for (var arg: args) {
+                Class<?> argClass = arg.getClass();
+                // Check and convert wrapper classes to corresponding primitive types, if necessary
+                if (argClass == Integer.class) {
+                    argClass = int.class;
+                } else if (argClass == Double.class) {
+                    argClass = double.class;
+                } else if (argClass == Float.class) {
+                    argClass = float.class;
+                } else if (argClass == Long.class) {
+                    argClass = long.class;
+                } else if (argClass == Boolean.class) {
+                    argClass = boolean.class;
+                } else if (argClass == Character.class) {
+                    argClass = char.class;
+                } else if (argClass == Byte.class) {
+                    argClass = byte.class;
+                } else if (argClass == Short.class) {
+                    argClass = short.class;
+                }
+                arguments.add(argClass);
             }
-            Class[] classType = new Class[arguments.size()];
-            for (int i=0; i< arguments.size(); i++){
-                classType[i] = arguments.get(i);
-            }
+
+            Class<?>[] classType = new Class<?>[arguments.size()];
+            classType = arguments.toArray(classType);
 
             return new CodeObject(dataType.getConstructor(classType).newInstance(args), this);
         } catch (Exception e) {
             throw new InvalidInitializerArgumentsError(e.getMessage());
         }
     }
+
 
 
 

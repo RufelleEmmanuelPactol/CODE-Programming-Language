@@ -12,7 +12,7 @@ public class CodeInteger extends CodeNumeric<Integer>{
         super("0", 0);
     }
 
-    public CodeInteger(Integer data) {
+    public CodeInteger(int data) {
         super(String.valueOf(data), data);
     }
 

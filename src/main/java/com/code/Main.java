@@ -10,6 +10,7 @@ import com.code.tokenizer.LeximCursor;
 import com.code.tokenizer.TokenCursor;
 import com.code.tokenizer.TokenFactory;
 import com.code.virtualmachine.CodeRuntime;
+import com.code.virtualmachine.CodeStandardLibrary;
 import com.code.virtualmachine.RegisterPrimitives;
 import com.code.virtualmachine.SimpleTimer;
 
@@ -17,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main {
 
@@ -28,10 +30,12 @@ public class Main {
 
         SimpleTimer.startTime();
 
+
         Main.args = args; // set the args to the args passed in the main method
         Thread.setDefaultUncaughtExceptionHandler(new StandardErrorHandler());
         RegisterPrimitives.registerPrimitives();
         rawCode = new ArrayList<>();
+        CodeStandardLibrary.registerStandardNatives();
         // This is the main method that is used to run the program.
         // This method reads the <file>.code file, and prepares for execution.
         // The CodeRuntime.getRuntime().runUsingMainThread() method is used to run the

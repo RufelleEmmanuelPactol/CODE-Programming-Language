@@ -2,6 +2,8 @@ package com.code.data;
 
 import com.code.errors.runtime.TypeError;
 
+import java.net.Socket;
+
 public class CodeFloat extends CodeNumeric<Double> {
     public CodeFloat(String data) {
         super(data, Double.parseDouble(data));
@@ -11,8 +13,8 @@ public class CodeFloat extends CodeNumeric<Double> {
         super("0", 0.0);
     }
 
-    public CodeFloat(Double data) {
-        super(data.toString(), data);
+    public CodeFloat(double data) {
+        super(Double.toString(data), data);
     }
 
     @Override
