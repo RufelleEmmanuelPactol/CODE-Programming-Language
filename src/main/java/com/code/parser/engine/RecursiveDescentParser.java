@@ -640,13 +640,6 @@ public class RecursiveDescentParser {
             }
         }
 
-        // After parsing all arguments, check for variadic syntax (...) if your language syntax supports it
-        // This is just a placeholder check. Implement according to your language syntax for variadic arguments.
-        // if (currentCursor.current() instanceof VariadicToken) {
-        //    args.add(new VariadicNode(parseVariadicArguments()));
-        //    currentCursor.next();
-        // }
-
         return args;
     }
 

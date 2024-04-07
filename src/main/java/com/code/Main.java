@@ -79,7 +79,7 @@ public class Main {
             String curDir= System.getProperty("user.dir");
             throw new FileNotFoundError(e.getMessage() + "\n\t\tCurrent Directory: " + curDir);
         }
-
+        CodeRuntime.forceFlush();
         System.out.println("\n>>> CODE successfully executed in " + SimpleTimer.endTime() + ".\n>>> Process finished with exit code 0.");
     }
 }

@@ -43,7 +43,7 @@ public class StandardErrorHandler implements Thread.UncaughtExceptionHandler {
                 System.err.println("\n\t\t " + border2);
                 System.err.println("\n\t\t   The virtual machine has detected a fatal error in the code execution.");
                 System.err.println("\n\t\t\tThe error is suspected to have been caused by line " + CodeRuntime.getRuntime().GLOBAL_THREAD.getCurrentLineNumber() + ".");
-                System.err.println("\t\t\tThe error is the following:");
+                System.err.println("\t\t\tThe error is the following: ");
                 System.err.println("\t\t\t>>>" + Main.rawCode.get(CodeRuntime.getRuntime().GLOBAL_THREAD.getCurrentLineNumber() - 1));
                 System.err.println("\n\n\t\t " + border2);
             }

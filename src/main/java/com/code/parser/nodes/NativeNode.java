@@ -14,7 +14,7 @@ public class NativeNode extends ASTNode{
     @Override
     public CodeObject execute() {
         sync();
-        Class<?> c = CodeStandardLibrary.getStandardNative(((Token)value).getTokenAsString());
+        Class<?> c = CodeStandardLibrary.getStandardNative((value).getTokenAsString());
         CodeRuntime.getRuntime().runtimeSymbolTable.registerNativeInterface(value.getTokenAsString(), c);
         return CodeClass.getNull();
     }

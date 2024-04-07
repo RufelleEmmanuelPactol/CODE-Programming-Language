@@ -16,7 +16,7 @@ public class CodeFileReader {
         System.err.println("Initializing CodeFileReader");
         File file = new File(Main.args.length > 0 ? Main.args[0] : "main.code");
         // Get the parent directory of the current file
-        System.out.println(file.getParent() + filePath);
+        CodeRuntime.getRuntime().println(file.getParent() + filePath);
         String directoryPath = file.getParent();
 
         reader = new BufferedReader(new java.io.FileReader(directoryPath + filePath));

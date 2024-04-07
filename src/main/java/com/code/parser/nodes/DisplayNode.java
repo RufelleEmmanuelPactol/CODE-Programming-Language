@@ -3,6 +3,7 @@ package com.code.parser.nodes;
 import com.code.data.CodeNil;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeObject;
+import com.code.virtualmachine.CodeRuntime;
 
 public class DisplayNode extends UnaryNode{
 
@@ -15,7 +16,7 @@ public class DisplayNode extends UnaryNode{
     public CodeObject execute() {
         sync();
         CodeObject childValue = child.execute();
-        System.out.print(childValue.getInstance());
+        CodeRuntime.print(childValue.getInstance());
         return childValue;
     }
 }

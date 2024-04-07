@@ -7,6 +7,7 @@ import com.code.errors.runtime.TypeError;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeClass;
 import com.code.virtualmachine.CodeObject;
+import com.code.virtualmachine.CodeRuntime;
 
 import java.util.List;
 import java.util.Scanner;
@@ -23,6 +24,7 @@ public class ScanNode extends ASTNode{
     @Override
     public CodeObject execute() {
         sync();
+        CodeRuntime.forceFlush();
         List<NonTerminalFactorNode> args = this.args.getArgs();
         for (var arg: args) {
             CodeObject result = arg.execute();

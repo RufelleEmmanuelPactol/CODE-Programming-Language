@@ -11,9 +11,14 @@ public class CodeChar extends CodeString{
 
     public CodeChar (String s) {
         super(s);
+
         if (s.length() != 3) {
             throw new TypeError("CHAR", "STRING", "assignment[Characters > 1]");
         }
+    }
+
+    public CodeChar(){
+        super(" ");
     }
 
 

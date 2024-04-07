@@ -5,6 +5,9 @@ import com.code.parser.engine.SymbolTable;
 import com.code.parser.nodes.ASTNode;
 import com.code.parser.nodes.CodeBlockNode;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +21,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CodeRuntime {
 
     private boolean RETURNING_FUNCTION = false;
+
+    private static BufferedOutputStream bufOut;
+    private static PrintStream printStream;
+
+    public static void print(Object o) {
+        printStream.print(o);
+    }
+
+
+    public static void forceFlush(){
+        printStream.flush();
+    }
+    public static void println(Object o) {
+        printStream.println(o);
+    }
+
 
     public void returnInterrupt() {
         RETURNING_FUNCTION = true;
@@ -100,6 +119,8 @@ public class CodeRuntime {
     private CodeRuntime() {
         GLOBAL_THREAD = new VMThread(1, "MAIN_THREAD");
         runtimeSymbolTable = new SymbolTable();
+        bufOut = new BufferedOutputStream(System.out);
+        printStream = new PrintStream(bufOut);
     };
 
     private CodeRuntime(SymbolTable s) {
