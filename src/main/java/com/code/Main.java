@@ -21,14 +21,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Main {
+    public static SimpleTimer simpleTimer;
 
     public static String[] args;
     public static Boolean DEBUG_MODE = false;
     public static ArrayList<String> rawCode;
     public static String currentLine;
     public static void main(String[] args) throws Exception {
-
-        SimpleTimer.startTime();
+        var simpleTimer = new SimpleTimer();
+        Main.simpleTimer = simpleTimer;
+        simpleTimer.startTime();
 
 
         Main.args = args; // set the args to the args passed in the main method
@@ -80,6 +82,6 @@ public class Main {
             throw new FileNotFoundError(e.getMessage() + "\n\t\tCurrent Directory: " + curDir);
         }
         CodeRuntime.forceFlush();
-        System.out.println("\n>>> CODE successfully executed in " + SimpleTimer.endTime() + ".\n>>> Process finished with exit code 0.");
+        System.out.println("\n>>> CODE successfully executed in " + simpleTimer.endTime() + ".\n>>> Process finished with exit code 0.");
     }
 }

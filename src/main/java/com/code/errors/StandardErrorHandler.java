@@ -51,7 +51,7 @@ public class StandardErrorHandler implements Thread.UncaughtExceptionHandler {
 
             System.err.println("\n\tThe error will cause the CODE Runtime (Virtual Machine) to stop execution.");
             System.err.println("\n\n>>> Process finished with exit code " + (e instanceof CodeError c ? c.hashcode() : e.hashCode()) + ".");
-            System.err.println(">>> CODE successfully executed in " + SimpleTimer.endTime() + ".");
+            System.err.println(">>> CODE successfully executed in " + Main.simpleTimer.endTime() + ".");
             if (Main.args.length == 0) {
                 e.printStackTrace();
             }

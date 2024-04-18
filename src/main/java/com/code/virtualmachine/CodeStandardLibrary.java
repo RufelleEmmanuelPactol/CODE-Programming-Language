@@ -25,6 +25,8 @@ public class CodeStandardLibrary {
         standardNatives.put("WebView", CodeWeb.class);
         standardNatives.put("FileReader", CodeFileReader.class);
         standardNatives.put("ThreadUtils", ThreadUtils.class);
+        standardNatives.put("DanjoCore", DanjoCore.class);
+        standardNatives.put("Timer", SimpleTimer.class);
     }
 
     public static Class<?> getStandardNative(String name) {

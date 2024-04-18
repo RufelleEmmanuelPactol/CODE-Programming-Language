@@ -21,7 +21,7 @@ public class LeximCursor implements Iterable<String> {
         String patternString =
                 "(\\\"(?:\\\\\\\"|[^\"])*?\\\")" +                  // Matches double-quoted string literals
                         "|('(?:\\\\'|[^'])*?')" +                            // Matches single-quoted string literals
-                        "|(>=|<>|<=|<|==|\\+\\+|--|\\+|-|/|\\*|>|%)" +        // Matches operators
+                        "|(>=|<>|<=|<|==|\\+\\+|--|\\+|-|/|\\*|>|%|!)" +        // Matches operators
                         "|([()=;.,:{}#$])" +                                  // Matches single character symbols, excluding []
                         "|(\\d+\\.\\d+|\\d+)" +                                // Matches floating-point numbers and integers
                         "|([\\w&|]+)" +                                       // Matches words (identifiers and keywords)

@@ -30,7 +30,6 @@ public class TokenFactory {
         addBinaryOperator("==");
         addBinaryOperator("+=");
         addBinaryOperator("<>");
-        addBinaryOperator("%");
         addBinaryOperator("AND");
         addBinaryOperator("OR");
         addUnaryOperator("NOT");
@@ -44,6 +43,7 @@ public class TokenFactory {
         factoryMaster.put("/", TermToken.class);
         factoryMaster.put("&", BinaryOperator.class);
         factoryMaster.put("+", MultiTypeOperator.class);
+        factoryMaster.put("%", ModOperator.class);
         factoryMaster.put("-", MultiTypeOperator.class);
         factoryMaster.put("FUNCTION", FunctionBlock.class);
         factoryMaster.put("IF", IfBlock.class);

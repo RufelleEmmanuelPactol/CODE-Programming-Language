@@ -1,6 +1,8 @@
 package com.code.virtualmachine;
 
+import com.code.data.CodeChar;
 import com.code.data.CodePrimitive;
+import com.code.data.CodeString;
 import com.code.errors.runtime.FieldDoesNotExistError;
 import com.code.errors.runtime.TypeError;
 
@@ -19,6 +21,13 @@ public class CodeObject {
     private final CodeClass codeClass;
 
     public CodeObject assign(CodeObject value) {
+        if (instance instanceof CodeChar c) {
+            if (value.instance instanceof CodeString) {
+                instance = new CodeChar(value.instance.toString());
+                return this;
+
+            }
+        }
         if (codeClass != value.codeClass) throw new TypeError(value, "assignment");
         instance = value.instance;
         return this;

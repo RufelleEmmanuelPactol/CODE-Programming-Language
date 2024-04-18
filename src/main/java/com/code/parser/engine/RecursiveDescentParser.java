@@ -371,8 +371,6 @@ public class RecursiveDescentParser {
         while (currentCursor.current() instanceof MultiTypeOperator) {
             Token operator = currentCursor.current();
             eat(MultiTypeOperator.class);
-
-
             left = new TermNode(left, operator, parseTerm());
         }
         return left;
@@ -411,7 +409,9 @@ public class RecursiveDescentParser {
             eat(RightParen.class);
             return result;
         }
+
         else if (current instanceof MultiTypeOperator) {
+            if (current instanceof ModOperator) throw new RuntimeException("[ParseError]: Expression cannot lead with token '%'.");
             eat(MultiTypeOperator.class);
             return new UnaryNode(current, parseFactor());
         } else if (current instanceof Variable) {
@@ -673,7 +673,6 @@ public class RecursiveDescentParser {
     }
 
     private ASTNode parseFor(){
-        CodeRuntime.getRuntime().pushSymbolTable();
         eat(ForToken.class);
         eat(LeftParen.class);
         ASTNode init = parseStatement();
@@ -707,7 +706,6 @@ public class RecursiveDescentParser {
                 statements.add(node);
             }
         }
-        CodeRuntime.getRuntime().popSymbolTable();
         return new ForNode(init, condition, increment, statements);
     }
 

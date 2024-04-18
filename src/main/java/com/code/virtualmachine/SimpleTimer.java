@@ -2,12 +2,12 @@ package com.code.virtualmachine;
 
 public class SimpleTimer {
     // Store the start time
-    private static long startTime = 0;
+    private long startTime = 0;
 
     /**
      * Starts the timer by recording the current time.
      */
-    public static void startTime() {
+    public  void startTime() {
         startTime = System.nanoTime();
     }
 
@@ -17,7 +17,7 @@ public class SimpleTimer {
      *
      * @return The elapsed time in seconds as a String.
      */
-    public static String endTime() {
+    public String endTime() {
 
 
         long endTime = System.nanoTime();
