@@ -95,7 +95,7 @@ public class TokenFactory {
         else if (str.matches("\".*\"")) {
             return new ValueToken(new CodeString(str));
         } else if (str.matches("'.*'")) {
-            return new ValueToken(new CodeChar(str));
+            return new ValueToken(new CodeChar(str.replaceAll("'", "")));
         }
         // Handle boolean literals
         else if (str.matches("TRUE|FALSE")) {
