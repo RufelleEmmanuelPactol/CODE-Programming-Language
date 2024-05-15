@@ -1,21 +1,28 @@
 package com.code.parser.nodes;
 
 import com.code.data.CodeString;
+import com.code.errors.compile.InvalidDeclaration;
 import com.code.errors.runtime.TypeError;
 import com.code.tokenizer.tokens.Token;
 import com.code.virtualmachine.CodeClass;
 import com.code.virtualmachine.CodeObject;
 import com.code.virtualmachine.CodeRuntime;
+import com.code.virtualmachine.CurrentRuntime;
 
 import java.util.List;
 
 public class VariableDeclarationNode extends ASTNode {
+
+    public static boolean isDeclared = true;
     protected Token type; // The data type of the variables
     protected List<VarDeclaration> declarations; // List of variable names and optional initial values
 
     public VariableDeclarationNode(Token type, List<VarDeclaration> declarations) {
         this.type = type;
         this.declarations = declarations;
+
+
+
     }
 
     // Inner class to hold each variable's name and optional initializer
@@ -51,6 +58,9 @@ public class VariableDeclarationNode extends ASTNode {
     @Override
     public CodeObject execute() {
         sync();
+        if (isDeclared && !CurrentRuntime.___MULVAR__SETTINGS__ENABLE) {
+            throw new InvalidDeclaration();
+        }
         String dataType = type.getTokenAsString();
         for (VarDeclaration declaration : declarations) {
             if (declaration.initializer != null) {

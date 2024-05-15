@@ -9,10 +9,7 @@ import com.code.parser.engine.RecursiveDescentParser;
 import com.code.tokenizer.LeximCursor;
 import com.code.tokenizer.TokenCursor;
 import com.code.tokenizer.TokenFactory;
-import com.code.virtualmachine.CodeRuntime;
-import com.code.virtualmachine.CodeStandardLibrary;
-import com.code.virtualmachine.RegisterPrimitives;
-import com.code.virtualmachine.SimpleTimer;
+import com.code.virtualmachine.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -75,6 +72,10 @@ public class Main {
             }
             rdp.parseCompletely();
             var symb = CodeRuntime.getRuntime().runtimeSymbolTable;
+
+            // add current runtime to the symbol table
+            CodeClass runtime = new CodeClass("__current__runtime__", CurrentRuntime.class);
+            symb.add("CURRENT_RUNTIME", runtime.initialize());
             CodeRuntime.getRuntime().runMain();
 
         } catch (IOException e) {

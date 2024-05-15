@@ -171,8 +171,8 @@ public class CodeRuntime {
         CodeBlockNode mainFunction = (CodeBlockNode) runtimeSymbolTable.search("CODE");
         if (mainFunction == null) {
             throw new NoStartError();
-        } for (ASTNode statement : mainFunction.getStatements()) {
-            statement.execute();
         }
+
+        mainFunction.execute();
     }
 }

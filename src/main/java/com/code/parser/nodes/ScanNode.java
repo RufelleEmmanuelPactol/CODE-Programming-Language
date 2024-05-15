@@ -1,5 +1,6 @@
 package com.code.parser.nodes;
 
+import com.code.data.CodeBoolean;
 import com.code.data.CodeFloat;
 import com.code.data.CodeInteger;
 import com.code.data.CodeString;
@@ -92,6 +93,14 @@ public class ScanNode extends ASTNode{
             } else if (result.getInstance() instanceof CodeInteger) {
                 result.assign(CodeClass.initializePrimitive("INT", Integer.parseInt(value.replace(" ", ""))));
                 continue;
+            } else if (result.getInstance() instanceof CodeBoolean) {
+
+                // assert value is all uppercase
+                String scannedValue = value.replace(" ", "").toLowerCase();
+                if (!(scannedValue.equals("true") || scannedValue.equals("false"))) {
+                    throw new RuntimeException("Invalid value, cannot assign value `" + value +"` to a boolean-type variable.");
+                }
+                result.assign(CodeClass.initializePrimitive("BOOL", Boolean.parseBoolean(scannedValue)));
             }else {
                 throw new TypeError(result,  "SCAN");
             }
