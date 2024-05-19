@@ -98,9 +98,9 @@ public class TokenFactory {
             return new ValueToken(new CodeChar(str.replaceAll("'", "")));
         }
         // Handle boolean literals
-        else if (str.matches("TRUE|FALSE")) {
+     /*   else if (str.matches("TRUE|FALSE")) {
             return new ValueToken(new CodeBoolean(Boolean.parseBoolean(str)));
-        }
+        } */
         // These brackets allow the display of one character.
         else if (str.matches("\\[.\\]")) {
             return new ValueToken(new CodeString(str));

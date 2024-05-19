@@ -79,7 +79,7 @@ public class CodeBoolean extends CodePrimitive<Boolean>{
 
     @Override
     public CodeBoolean not() {
-        return this == TRUE ? FALSE : TRUE;
+        return this.data ? FALSE : TRUE;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.code.tokenizer;
 
-import com.code.errors.compile.ParseError;
+import  com.code.errors.compile.ParseError;
 import com.code.tokenizer.tokens.NewLine;
 import com.code.tokenizer.tokens.SemicolonToken;
 import com.code.tokenizer.tokens.Token;

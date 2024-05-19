@@ -59,7 +59,7 @@ public class VariableDeclarationNode extends ASTNode {
     public CodeObject execute() {
         sync();
         if (isDeclared && !CurrentRuntime.___MULVAR__SETTINGS__ENABLE) {
-            throw new InvalidDeclaration();
+       //     throw new InvalidDeclaration();
         }
         String dataType = type.getTokenAsString();
         for (VarDeclaration declaration : declarations) {
